@@ -38,7 +38,7 @@ export default function Home() {
       setSelectedChannel(channel);
       setActiveSource(null); // Open modal
     }
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo(0, 0);
   };
 
   const handleSourceSelect = async (channel, source) => {
@@ -52,7 +52,7 @@ export default function Home() {
       alert("Failed to load stream. Please try another server.");
     } finally {
       setIsFetchingSource(false);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo(0, 0);
     }
   };
 
@@ -86,9 +86,9 @@ export default function Home() {
       <main className="px-6 mt-6 max-w-7xl mx-auto">
         {/* Inline Player Loading State */}
         {isFetchingSource && (
-          <div className="relative w-full max-w-4xl mx-auto mb-8 bg-[#111] rounded-2xl aspect-video flex flex-col items-center justify-center shadow-2xl ring-1 ring-white/10 mt-6 animate-pulse">
-             <Loader2 className="w-12 h-12 text-red-500 animate-spin mb-4" />
-             <p className="text-zinc-400 font-medium">Securing connection...</p>
+          <div className="relative w-full max-w-4xl mx-auto mb-8 bg-[#111] rounded-xl aspect-video flex flex-col items-center justify-center shadow-2xl ring-1 ring-white/10 mt-4 animate-pulse">
+             <div className="w-8 h-8 border-4 border-red-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+             <p className="text-zinc-400 font-medium">Connecting...</p>
           </div>
         )}
 
@@ -123,12 +123,12 @@ export default function Home() {
         ) : (
           <>
             {/* Channels Grid */}
-            <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3">
               {filteredChannels.map(channel => (
                 <button
                   key={channel.id}
                   onClick={() => handleChannelClick(channel)}
-                  className="group relative bg-[#111] rounded-2xl p-3 border border-white/5 hover:border-red-500/50 hover:shadow-[0_0_20px_rgba(239,68,68,0.2)] transition-all duration-300 text-left flex flex-col hover:-translate-y-1"
+                  className="group relative bg-[#111] rounded-xl p-2 border border-white/5 hover:border-red-500/50 hover:shadow-[0_0_20px_rgba(239,68,68,0.2)] transition-all duration-300 text-left flex flex-col hover:-translate-y-1"
                 >
                   <div className="w-full aspect-video bg-black rounded-xl mb-3 overflow-hidden flex items-center justify-center relative p-2">
                     <img
@@ -137,18 +137,18 @@ export default function Home() {
                       loading="lazy"
                       className="object-contain w-full h-full opacity-80 group-hover:opacity-100 group-hover:scale-105 transition duration-500"
                     />
-                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm">
-                      <div className="w-12 h-12 rounded-full bg-red-500/90 flex items-center justify-center text-white shadow-lg">
-                        <Play className="fill-white w-6 h-6 ml-1" />
+                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="w-8 h-8 rounded-full bg-red-500 flex items-center justify-center text-white shadow-lg">
+                        <Play className="fill-white w-4 h-4 ml-0.5" />
                       </div>
                     </div>
                   </div>
 
                   <div className="w-full px-1">
-                    <h2 className="font-semibold text-sm truncate text-zinc-100">
+                    <h2 className="font-semibold text-[10px] sm:text-xs truncate text-zinc-100">
                       {channel.name}
                     </h2>
-                    <p className="text-xs text-red-400 mt-1 font-medium truncate">
+                    <p className="text-[9px] text-red-400 font-medium truncate">
                       {channel.category}
                     </p>
                   </div>
