@@ -7,16 +7,23 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+const HEADERS = {
+  'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+  'Accept': 'application/json',
+  'Origin': 'https://iyadtv.pages.dev',
+  'Referer': 'https://iyadtv.pages.dev/'
+};
+
 // iYAD API Proxy Methods
 async function getIyadToken() {
-  const tokenRes = await fetch('https://api.iyad.space/token');
+  const tokenRes = await fetch('https://api.iyad.space/token', { headers: HEADERS });
   const tokenData = await tokenRes.json();
   return tokenData.token;
 }
 
 async function getIyadKey(token) {
   const keyRes = await fetch('https://api.iyad.space/key', {
-    headers: { 'Authorization': 'Bearer ' + token }
+    headers: { ...HEADERS, 'Authorization': 'Bearer ' + token }
   });
   const keyData = await keyRes.json();
   return keyData.key;
@@ -44,7 +51,7 @@ app.get('/api/channels', async (req, res) => {
     const key = await getIyadKey(token);
     
     const dataRes = await fetch('https://api.iyad.space/data', {
-      headers: { 'Authorization': 'Bearer ' + token }
+      headers: { ...HEADERS, 'Authorization': 'Bearer ' + token }
     });
     const dataJson = await dataRes.json();
     
@@ -72,7 +79,7 @@ app.get('/api/channels', async (req, res) => {
     res.json(formattedChannels);
   } catch(e) {
     console.error(e);
-    res.status(500).json({ error: 'Failed to fetch channels' });
+    res.status(500).json({ error: 'Failed to fetch channels', message: e.message });
   }
 });
 
@@ -86,6 +93,7 @@ app.post('/api/stream', async (req, res) => {
     const playRes = await fetch('https://api.iyad.space/play', {
       method: 'POST',
       headers: { 
+        ...HEADERS,
         'Authorization': 'Bearer ' + token,
         'Content-Type': 'application/json'
       },
