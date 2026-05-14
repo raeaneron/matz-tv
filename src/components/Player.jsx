@@ -40,18 +40,29 @@ export default function Player({ source, channelName, onClose }) {
   }, [source]);
 
   return (
-    <div className="relative w-full max-w-4xl mx-auto mb-8 bg-black rounded-2xl overflow-hidden shadow-2xl ring-1 ring-white/10 mt-6 animate-fade-in">
-      <div className="absolute top-4 right-4 z-10">
-        <button onClick={onClose} className="p-2 bg-black/50 hover:bg-red-500/80 rounded-full text-white transition backdrop-blur-sm">
-          <X size={20} />
-        </button>
-      </div>
-      <div className="absolute top-4 left-4 z-10">
-        <span className="px-3 py-1 bg-black/50 text-white font-medium rounded-lg backdrop-blur-sm shadow text-sm border border-white/10">
+    <div className="relative w-full lg:max-w-5xl mx-auto mb-6 bg-black rounded-xl overflow-hidden shadow-2xl ring-1 ring-white/10 mt-4">
+      {/* Header Info - Simplified for old Safari */}
+      <div className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between p-3 bg-gradient-to-b from-black/80 to-transparent pointer-events-none">
+        <span className="px-2 py-1 bg-black/40 text-white font-medium rounded backdrop-blur-sm text-xs border border-white/10">
           {channelName}
         </span>
+        <button 
+          onClick={onClose} 
+          className="p-2 bg-red-500/90 rounded-full text-white pointer-events-auto shadow-lg active:scale-95 transition-transform"
+        >
+          <X size={18} />
+        </button>
       </div>
-      <video ref={videoRef} controls autoPlay className="w-full aspect-video" />
+
+      <div className="w-full bg-black">
+        <video 
+          ref={videoRef} 
+          controls 
+          autoPlay 
+          playsInline 
+          className="w-full h-auto aspect-video" 
+        />
+      </div>
     </div>
   );
 }
