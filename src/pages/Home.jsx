@@ -10,6 +10,7 @@ export default function Home() {
   const [activeSource, setActiveSource] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isFetchingSource, setIsFetchingSource] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     // Fetch channels directly from the IPTV API (client-side)
@@ -20,6 +21,7 @@ export default function Home() {
       })
       .catch(err => {
         console.error("Error loading channels", err);
+        setError(err.message || "Failed to load channels. Please check your connection.");
         setIsLoading(false);
       });
   }, []);
@@ -99,7 +101,21 @@ export default function Home() {
           />
         )}
 
-        {isLoading ? (
+        {error ? (
+          <div className="flex flex-col items-center justify-center py-32 text-center px-4">
+            <div className="w-16 h-16 bg-red-500/10 text-red-500 rounded-full flex items-center justify-center mb-6">
+               <X size={32} />
+            </div>
+            <h2 className="text-xl font-bold mb-2">Something went wrong</h2>
+            <p className="text-zinc-400 mb-6 max-w-md">{error}</p>
+            <button 
+              onClick={() => window.location.reload()}
+              className="px-6 py-2 bg-red-500 hover:bg-red-600 rounded-xl transition font-semibold"
+            >
+              Try Again
+            </button>
+          </div>
+        ) : isLoading ? (
           <div className="flex flex-col items-center justify-center py-32">
             <Loader2 className="w-10 h-10 text-red-500 animate-spin mb-4" />
             <p className="text-zinc-400">Loading IPTV Channels...</p>

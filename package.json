@@ -26,7 +26,8 @@
     "react-dom": "^19.2.6",
     "react-router-dom": "^7.15.1",
     "serverless-http": "^4.0.0",
-    "terser": "^5.47.1"
+    "terser": "^5.47.1",
+    "whatwg-fetch": "^3.6.20"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
