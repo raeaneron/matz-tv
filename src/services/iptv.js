@@ -1,35 +1,28 @@
+import CryptoJS from 'crypto-js';
+
 const API_BASE = 'https://api.iyad.space';
 
 async function decrypt(encryptedBase64, keyString) {
-  const binaryString = atob(encryptedBase64);
-  const bytes = new Uint8Array(binaryString.length);
-  for (let i = 0; i < binaryString.length; i++) {
-    bytes[i] = binaryString.charCodeAt(i);
-  }
+  // Convert base64 string to CryptoJS WordArray
+  const encryptedWA = CryptoJS.enc.Base64.parse(encryptedBase64);
+  
+  // Extract IV (first 16 bytes)
+  const iv = CryptoJS.lib.WordArray.create(encryptedWA.words.slice(0, 4), 16);
+  
+  // Extract ciphertext (remaining bytes)
+  const ciphertext = CryptoJS.lib.WordArray.create(encryptedWA.words.slice(4), encryptedWA.sigBytes - 16);
 
-  const iv = bytes.slice(0, 16);
-  const ciphertext = bytes.slice(16);
+  // Parse key string (ensure it's treated as UTF-8)
+  const key = CryptoJS.enc.Utf8.parse(keyString.substring(0, 16));
 
-  const keyBytes = new TextEncoder().encode(keyString);
-  // Ensure key is 16 bytes (AES-128)
-  const paddedKey = new Uint8Array(16);
-  paddedKey.set(keyBytes.slice(0, 16));
-
-  const cryptoKey = await crypto.subtle.importKey(
-    "raw",
-    paddedKey,
-    { name: "AES-CBC" },
-    false,
-    ["decrypt"]
+  // Decrypt using AES-CBC
+  const decrypted = CryptoJS.AES.decrypt(
+    { ciphertext: ciphertext },
+    key,
+    { iv: iv, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7 }
   );
 
-  const decryptedBuffer = await crypto.subtle.decrypt(
-    { name: "AES-CBC", iv: iv },
-    cryptoKey,
-    ciphertext
-  );
-
-  return new TextDecoder().decode(decryptedBuffer);
+  return decrypted.toString(CryptoJS.enc.Utf8);
 }
 
 export const iptvService = {
