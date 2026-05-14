@@ -1,9 +1,7 @@
 import { useState, useEffect } from 'react';
 import Player from '../components/Player';
 import { Search, Play, X, Loader2 } from 'lucide-react';
-import axios from 'axios';
-
-const API_URL = '/api';
+import { iptvService } from '../services/iptv';
 
 export default function Home() {
   const [channels, setChannels] = useState([]);
@@ -14,10 +12,10 @@ export default function Home() {
   const [isFetchingSource, setIsFetchingSource] = useState(false);
 
   useEffect(() => {
-    // Fetch channels from our proxy backend
-    axios.get(`${API_URL}/channels`)
-      .then(res => {
-        setChannels(res.data);
+    // Fetch channels directly from the IPTV API (client-side)
+    iptvService.fetchChannels()
+      .then(data => {
+        setChannels(data);
         setIsLoading(false);
       })
       .catch(err => {
@@ -45,12 +43,8 @@ export default function Home() {
     setSelectedChannel(channel);
     setIsFetchingSource(true);
     try {
-      const res = await axios.post(`${API_URL}/stream`, {
-        channelName: channel.name,
-        serverIndex: source.index
-      });
-      // The backend returns { url, type }
-      setActiveSource({ name: source.name, url: res.data.url, type: res.data.type });
+      const streamInfo = await iptvService.fetchStream(channel.name, source.index);
+      setActiveSource({ name: source.name, url: streamInfo.url, type: streamInfo.type });
     } catch(err) {
       console.error("Error fetching stream url", err);
       alert("Failed to load stream. Please try another server.");
