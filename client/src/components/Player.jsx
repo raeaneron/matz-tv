@@ -13,7 +13,7 @@ function detectStreamType(url, hintType) {
   return hintType || 'hls';
 }
 
-export default function Player({ source, channelName, onClose }) {
+export default function Player({ source, channelName, onClose, availableSources, onSwitchSource }) {
   const videoRef = useRef(null);
   const playerInstanceRef = useRef(null);
   const [error, setError] = useState(null);
@@ -192,9 +192,28 @@ export default function Player({ source, channelName, onClose }) {
             {isDrmError ? <Shield className="w-10 h-10 text-yellow-500 mb-4" /> : <AlertCircle className="w-10 h-10 text-red-500 mb-4" />}
             <h3 className="text-sm font-bold text-white mb-2">{isDrmError ? 'DRM Protected' : 'Playback Failed'}</h3>
             <p className="text-zinc-500 text-[10px] sm:text-xs max-w-[300px] mb-6 leading-relaxed font-mono">{error}</p>
-            <button onClick={onClose} className="px-5 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-xs font-bold transition active:scale-95 shadow-lg">
-              TRY ANOTHER SERVER
-            </button>
+            
+            <div className="flex flex-col gap-3 w-full max-w-[240px]">
+               {availableSources && availableSources.length > 1 && (
+                 <div className="flex flex-col gap-2">
+                   <p className="text-[9px] text-zinc-600 uppercase font-bold tracking-widest">Try another server:</p>
+                   <div className="grid grid-cols-2 gap-2">
+                     {availableSources.filter(s => s.name !== source.name).slice(0, 4).map((s, idx) => (
+                       <button 
+                         key={idx}
+                         onClick={() => onSwitchSource(s)}
+                         className="px-2 py-2 bg-red-600/10 hover:bg-red-600 border border-red-500/20 rounded text-[9px] font-bold transition active:scale-95 text-red-500 hover:text-white"
+                       >
+                         {s.name}
+                       </button>
+                     ))}
+                   </div>
+                 </div>
+               )}
+               <button onClick={onClose} className="px-5 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-xs font-bold transition active:scale-95 shadow-lg border border-white/5">
+                 BACK TO LIST
+               </button>
+            </div>
           </div>
         )}
 

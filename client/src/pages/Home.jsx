@@ -113,11 +113,29 @@ export default function Home() {
 
         {/* Inline Player */}
         {!isFetchingSource && activeSource && selectedChannel && (
-          <Player 
-            source={activeSource} 
-            channelName={selectedChannel.name} 
-            onClose={() => { setActiveSource(null); setSelectedChannel(null); }} 
-          />
+          <div className="flex flex-col items-center">
+            <Player 
+              source={activeSource} 
+              channelName={selectedChannel.name} 
+              onClose={() => { setActiveSource(null); setSelectedChannel(null); }} 
+              availableSources={selectedChannel.sources}
+              onSwitchSource={(s) => handleSourceSelect(selectedChannel, s)}
+            />
+            
+            {/* Inline Server Selector for quick switching */}
+            <div className="w-full max-w-4xl bg-zinc-900/50 border border-white/5 rounded-xl p-3 mb-6 flex flex-wrap items-center gap-2">
+              <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mr-2">Servers:</span>
+              {selectedChannel.sources.map((s, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => handleSourceSelect(selectedChannel, s)}
+                  className={`px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all border ${activeSource.name === s.name ? 'bg-red-600 border-red-500 text-white' : 'bg-zinc-800 border-white/5 text-zinc-400 hover:text-white hover:bg-zinc-700'}`}
+                >
+                  {s.name}
+                </button>
+              ))}
+            </div>
+          </div>
         )}
 
         {error ? (
