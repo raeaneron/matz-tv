@@ -22,7 +22,19 @@ export default function Player({ source, channelName, onClose }) {
     }
 
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    const isLegacyIOS = isIOS && (
+      /OS 10_/.test(navigator.userAgent) || 
+      /OS 9_/.test(navigator.userAgent) ||
+      /OS 11_/.test(navigator.userAgent)
+    );
     
+    // Check for DASH/MPD incompatibility on legacy iOS
+    if (source.type === 'mpd' && isLegacyIOS) {
+      setError("This channel uses DASH (MPD) which is not supported on older iPads. Please try GTV or a different channel.");
+      setIsBuffering(false);
+      return;
+    }
+
     // For iPad 4 (iOS 10) and other iOS devices, native HLS is much more reliable than hls.js
     if (isIOS || video.canPlayType('application/vnd.apple.mpegurl')) {
       console.log("Using native HLS playback");
@@ -35,7 +47,11 @@ export default function Player({ source, channelName, onClose }) {
       
       const handleError = (e) => {
         console.error("Native playback error", e);
-        setError("Stream unavailable or incompatible with this device.");
+        if (source.type === 'mpd') {
+          setError("DASH (MPD) streams are not supported on this device.");
+        } else {
+          setError("Stream unavailable or incompatible. Try a different server.");
+        }
         setIsBuffering(false);
       };
 
