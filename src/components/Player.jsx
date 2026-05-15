@@ -1,61 +1,134 @@
-import React, { useEffect, useRef } from 'react';
-import { X } from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react';
+import { X, AlertCircle, Loader2, Play } from 'lucide-react';
+import Hls from 'hls.js';
 
 export default function Player({ source, channelName, onClose }) {
   const videoRef = useRef(null);
+  const hlsRef = useRef(null);
+  const [error, setError] = useState(null);
+  const [isBuffering, setIsBuffering] = useState(true);
 
   useEffect(() => {
     if (!source || !videoRef.current) return;
 
     const video = videoRef.current;
-    
-    // On iOS/Safari 10, we should use native HLS playback directly.
-    // We don't need Hls.js or Plyr which might be too heavy or incompatible.
-    video.src = source.url;
-    
-    // Attempt to play
-    const playPromise = video.play();
-    if (playPromise !== undefined) {
-      playPromise.catch(error => {
-        console.log("Autoplay prevented:", error);
-      });
+    setError(null);
+    setIsBuffering(true);
+
+    // Clean up previous Hls instance
+    if (hlsRef.current) {
+      hlsRef.current.destroy();
+      hlsRef.current = null;
     }
+
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    
+    // For iPad 4 (iOS 10) and other iOS devices, native HLS is much more reliable than hls.js
+    if (isIOS || video.canPlayType('application/vnd.apple.mpegurl')) {
+      console.log("Using native HLS playback");
+      video.src = source.url;
+      
+      const handleLoaded = () => {
+        setIsBuffering(false);
+        video.play().catch(e => console.log("Native play prevented", e));
+      };
+      
+      const handleError = (e) => {
+        console.error("Native playback error", e);
+        setError("Stream unavailable or incompatible with this device.");
+        setIsBuffering(false);
+      };
+
+      video.addEventListener('loadedmetadata', handleLoaded);
+      video.addEventListener('error', handleError);
+      
+      return () => {
+        video.removeEventListener('loadedmetadata', handleLoaded);
+        video.removeEventListener('error', handleError);
+      };
+    } 
+    // Fallback to Hls.js for Chrome/Firefox/etc.
+    else if (Hls.isSupported()) {
+      console.log("Using Hls.js playback");
+      const hls = new Hls({
+        enableWorker: false, // Workers might fail on old browsers
+        lowLatencyMode: true,
+      });
+      hlsRef.current = hls;
+      hls.loadSource(source.url);
+      hls.attachMedia(video);
+      hls.on(Hls.Events.MANIFEST_PARSED, () => {
+        video.play().catch(e => console.log("HLS play prevented", e));
+        setIsBuffering(false);
+      });
+      hls.on(Hls.Events.ERROR, (event, data) => {
+        if (data.fatal) {
+          setError("Failed to load stream. Please try another server.");
+          setIsBuffering(false);
+        }
+      });
+    } else {
+      setError("Your browser does not support this video format.");
+      setIsBuffering(false);
+    }
+
+    return () => {
+      if (hlsRef.current) {
+        hlsRef.current.destroy();
+      }
+    };
   }, [source]);
 
   return (
-    <div className="relative w-full lg:max-w-5xl mx-auto mb-6 bg-black rounded-lg overflow-hidden shadow-2xl ring-1 ring-white/10 mt-2">
-      {/* Native-style header */}
-      <div className="absolute top-0 left-0 right-0 z-30 flex items-center justify-between p-2 bg-gradient-to-b from-black/90 to-transparent">
+    <div className="relative w-full max-w-4xl mx-auto mb-6 bg-black rounded-xl overflow-hidden shadow-2xl border border-white/5 mt-2">
+      {/* Header */}
+      <div className="absolute top-0 left-0 right-0 z-30 flex items-center justify-between p-3 bg-gradient-to-b from-black/80 to-transparent">
         <div className="flex items-center gap-2">
-           <span className="px-2 py-0.5 bg-red-600 text-white font-bold rounded text-[10px] uppercase tracking-wider">
+           <div className="px-1.5 py-0.5 bg-red-600 text-white font-bold rounded text-[9px] uppercase tracking-tighter">
              LIVE
-           </span>
-           <span className="text-white font-semibold text-xs drop-shadow-md">
+           </div>
+           <span className="text-white font-bold text-xs truncate max-w-[200px]">
              {channelName}
            </span>
         </div>
         <button 
           onClick={onClose} 
-          className="p-1.5 bg-white/10 hover:bg-red-500 rounded-full text-white transition-colors"
-          style={{ cursor: 'pointer', pointerEvents: 'auto' }}
+          className="p-1.5 bg-white/10 hover:bg-red-600 rounded-full text-white transition active:scale-90"
         >
-          <X size={18} />
+          <X size={16} />
         </button>
       </div>
 
-      <div className="w-full bg-black flex items-center justify-center aspect-video">
+      <div className="w-full bg-black flex items-center justify-center aspect-video relative">
+        {isBuffering && !error && (
+          <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-black/40">
+            <Loader2 className="w-8 h-8 text-red-600 animate-spin mb-2" />
+          </div>
+        )}
+
+        {error && (
+          <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-zinc-900 px-4 text-center">
+            <AlertCircle className="w-8 h-8 text-red-500 mb-2" />
+            <h3 className="text-sm font-bold text-white mb-1">Playback Error</h3>
+            <p className="text-zinc-500 text-[10px] max-w-[200px] mb-4">{error}</p>
+            <button 
+              onClick={() => window.location.reload()}
+              className="px-4 py-1.5 bg-red-600 rounded-lg text-xs font-bold transition active:scale-95"
+            >
+              RETRY
+            </button>
+          </div>
+        )}
+
         <video 
           ref={videoRef} 
           controls 
           autoPlay 
           playsInline
           webkit-playsinline="true"
-          className="w-full h-full max-h-[70vh]"
+          className="w-full h-full"
           style={{ backgroundColor: 'black' }}
-        >
-          <source src={source.url} type="application/x-mpegURL" />
-          Your browser does not support the video tag.
-        </video>
+        />
       </div>
     </div>
   );
