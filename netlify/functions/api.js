@@ -2,6 +2,7 @@ const serverless = require('serverless-http');
 const express = require('express');
 const cors = require('cors');
 const crypto = require('crypto');
+const axios = require('axios');
 
 const app = express();
 app.use(cors());
@@ -16,46 +17,50 @@ const HEADERS = {
 
 // iYAD API Proxy Methods
 async function getIyadToken() {
-  const tokenRes = await fetch('https://api.iyad.space/token', { headers: HEADERS });
-  const tokenData = await tokenRes.json();
-  return tokenData.token;
+  const res = await axios.get('https://api.iyad.space/token', { headers: HEADERS });
+  return res.data.token;
 }
 
 async function getIyadKey(token) {
-  const keyRes = await fetch('https://api.iyad.space/key', {
+  const res = await axios.get('https://api.iyad.space/key', {
     headers: { ...HEADERS, 'Authorization': 'Bearer ' + token }
   });
-  const keyData = await keyRes.json();
-  return keyData.key;
+  return res.data.key;
 }
 
 function decryptIyadData(encryptedData, keyString) {
-  const buffer = Buffer.from(encryptedData, 'base64');
-  const iv = buffer.slice(0, 16);
-  const ciphertext = buffer.slice(16);
-  
-  const keyBuffer = Buffer.alloc(16);
-  keyBuffer.write(keyString, 'utf-8');
-  
-  const decipher = crypto.createDecipheriv('aes-128-cbc', keyBuffer, iv);
-  let decrypted = decipher.update(ciphertext);
-  decrypted = Buffer.concat([decrypted, decipher.final()]);
-  
-  return JSON.parse(decrypted.toString('utf-8'));
+  try {
+    const buffer = Buffer.from(encryptedData, 'base64');
+    const iv = buffer.slice(0, 16);
+    const ciphertext = buffer.slice(16);
+    
+    const keyBuffer = Buffer.alloc(16);
+    keyBuffer.write(keyString.substring(0, 16), 'utf-8');
+    
+    const decipher = crypto.createDecipheriv('aes-128-cbc', keyBuffer, iv);
+    let decrypted = decipher.update(ciphertext);
+    decrypted = Buffer.concat([decrypted, decipher.final()]);
+    
+    return JSON.parse(decrypted.toString('utf-8'));
+  } catch (e) {
+    console.error("Decryption Error:", e.message);
+    throw new Error("Decryption failed: " + e.message);
+  }
 }
 
 // Routes
-app.get('/api/channels', async (req, res) => {
+// Support both /api/channels and /channels to be safe
+const getChannels = async (req, res) => {
   try {
+    console.log("Fetching channels...");
     const token = await getIyadToken();
     const key = await getIyadKey(token);
     
-    const dataRes = await fetch('https://api.iyad.space/data', {
+    const dataRes = await axios.get('https://api.iyad.space/data', {
       headers: { ...HEADERS, 'Authorization': 'Bearer ' + token }
     });
-    const dataJson = await dataRes.json();
     
-    const channels = decryptIyadData(dataJson.data, key);
+    const channels = decryptIyadData(dataRes.data.data, key);
     
     const formattedChannels = channels.filter(c => c.enabled !== false).map((c, index) => {
       const sources = [{ name: c.alt_name || "Stream 1", index: 0 }];
@@ -76,42 +81,49 @@ app.get('/api/channels', async (req, res) => {
       };
     });
     
+    console.log(`Successfully formatted ${formattedChannels.length} channels`);
     res.json(formattedChannels);
   } catch(e) {
-    console.error(e);
-    res.status(500).json({ error: 'Failed to fetch channels', message: e.message });
+    console.error("API Error (Channels):", e.response?.data || e.message);
+    res.status(500).json({ 
+      error: 'Failed to fetch channels', 
+      message: e.message,
+      details: e.response?.data || null
+    });
   }
-});
+};
 
-app.post('/api/stream', async (req, res) => {
+const getStream = async (req, res) => {
   try {
     const { channelName, serverIndex } = req.body;
+    console.log(`Fetching stream for ${channelName} (Server ${serverIndex})...`);
     
     const token = await getIyadToken();
     const key = await getIyadKey(token);
     
-    const playRes = await fetch('https://api.iyad.space/play', {
-      method: 'POST',
-      headers: { 
-        ...HEADERS,
-        'Authorization': 'Bearer ' + token,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ channelName: channelName, serverIndex: serverIndex || 0 })
-    });
+    const playRes = await axios.post('https://api.iyad.space/play', 
+      { channelName: channelName, serverIndex: serverIndex || 0 },
+      { 
+        headers: { 
+          ...HEADERS,
+          'Authorization': 'Bearer ' + token,
+          'Content-Type': 'application/json'
+        }
+      }
+    );
     
-    if (!playRes.ok) {
-       return res.status(403).json({ error: 'Playback Unauthorized' });
-    }
-    
-    const playJson = await playRes.json();
-    const streamInfo = decryptIyadData(playJson.data, key);
-    
+    const streamInfo = decryptIyadData(playRes.data.data, key);
     res.json(streamInfo);
   } catch(e) {
-    console.error(e);
-    res.status(500).json({ error: 'Failed to fetch stream' });
+    console.error("API Error (Stream):", e.response?.data || e.message);
+    res.status(500).json({ error: 'Failed to fetch stream', message: e.message });
   }
-});
+};
+
+app.get('/api/channels', getChannels);
+app.get('/channels', getChannels); // Fallback
+
+app.post('/api/stream', getStream);
+app.post('/stream', getStream); // Fallback
 
 module.exports.handler = serverless(app);
