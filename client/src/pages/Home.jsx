@@ -14,17 +14,19 @@ export default function Home() {
   const [viewMode, setViewMode] = useState('list'); // Default to list for better performance on old devices
 
   useEffect(() => {
-    // Fetch channels directly from the IPTV API (client-side)
-    iptvService.fetchChannels()
-      .then(data => {
+    const loadChannels = async () => {
+      setIsLoading(true);
+      try {
+        const data = await iptvService.fetchChannels();
         setChannels(data);
+      } catch (err) {
+        console.error("Failed to load channels, using fallback", err);
+        // Fallback or handle error appropriately
+      } finally {
         setIsLoading(false);
-      })
-      .catch(err => {
-        console.error("Error loading channels", err);
-        setError(err.message || "Failed to load channels. Please check your connection.");
-        setIsLoading(false);
-      });
+      }
+    };
+    loadChannels();
   }, []);
 
   const filteredChannels = channels.filter(c => 
@@ -47,7 +49,7 @@ export default function Home() {
     setIsFetchingSource(true);
     try {
       const streamInfo = await iptvService.fetchStream(channel.name, source.index);
-      setActiveSource({ name: source.name, url: streamInfo.url, type: streamInfo.type });
+      setActiveSource({ name: source.name, url: streamInfo.url, type: streamInfo.type, keyId: streamInfo.keyId, key: streamInfo.key });
     } catch(err) {
       console.error("Error fetching stream url", err);
       alert("Failed to load stream. Please try another server.");
@@ -134,13 +136,12 @@ export default function Home() {
           </div>
         ) : isLoading ? (
           <div className="flex flex-col items-center justify-center py-20">
-            <Loader2 className="w-8 h-8 text-red-600 animate-spin mb-3" />
-            <p className="text-zinc-500 text-xs">Loading Channels...</p>
+            <Loader2 className="w-10 h-10 text-red-600 animate-spin mb-4" />
+            <p className="text-zinc-500 text-sm animate-pulse">Fetching latest channels...</p>
           </div>
         ) : (
           <>
             {viewMode === 'grid' ? (
-              /* Much Smaller Grid View */
               <div className="grid grid-cols-4 xs:grid-cols-5 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 xl:grid-cols-12 gap-2 sm:gap-2.5">
                 {filteredChannels.map(channel => (
                   <button
@@ -168,7 +169,6 @@ export default function Home() {
                 ))}
               </div>
             ) : (
-              /* List View - Best for old iPad - Removed 'gap' for iOS 10 compatibility */
               <div className="flex flex-col max-w-4xl mx-auto">
                 {filteredChannels.map(channel => (
                   <button

@@ -27,6 +27,8 @@
     "react-router-dom": "^7.15.1",
     "serverless-http": "^4.0.0",
     "terser": "^5.47.1",
+    "video.js": "^8.23.7",
+    "videojs-contrib-eme": "^5.5.2",
     "whatwg-fetch": "^3.6.20"
   },
   "devDependencies": {

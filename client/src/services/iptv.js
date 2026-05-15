@@ -1,6 +1,7 @@
 import CryptoJS from 'crypto-js';
 
 const API_BASE = 'https://api.iyad.space';
+const PROXY_PATH = window.location.hostname === 'localhost' ? 'http://localhost:5000/api/proxy' : '/api/proxy';
 
 async function decrypt(encryptedBase64, keyString) {
   try {
@@ -16,7 +17,7 @@ async function decrypt(encryptedBase64, keyString) {
     );
 
     const result = decrypted.toString(CryptoJS.enc.Utf8);
-    if (!result) throw new Error("Decryption returned empty result");
+    if (!result) throw new Error("Empty result");
     return result;
   } catch (e) {
     throw new Error(`Decryption failed: ${e.message}`);
@@ -42,12 +43,15 @@ export const iptvService = {
       const decryptedJson = await decrypt(data, key);
       const channels = JSON.parse(decryptedJson);
 
-      return channels.filter(c => c.enabled !== false).map((c, index) => {
-        const sources = [{ name: c.alt_name || "Stream 1", index: 0 }];
+      return channels.filter(c => {
+        if (c.enabled !== false) return true;
+        const name = (c.name || '').toLowerCase();
+        return name.includes('gma') || name.includes('kapamilya');
+      }).map((c, index) => {
+        const sources = [{ name: c.alt_name || "Server 1", index: 0 }];
         for (let i = 2; i <= 10; i++) {
           if (c[`alt_name${i}`]) sources.push({ name: c[`alt_name${i}`], index: i });
         }
-
         return {
           id: index + 1,
           name: c.name,
@@ -78,12 +82,32 @@ export const iptvService = {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ channelName, serverIndex: serverIndex || 0 })
+        body: JSON.stringify({ channelName, serverIndex: parseInt(serverIndex) })
       });
+
+      if (!playRes.ok) throw new Error("Stream request failed");
 
       const { data } = await playRes.json();
       const decryptedJson = await decrypt(data, key);
-      return JSON.parse(decryptedJson);
+      const streamInfo = JSON.parse(decryptedJson);
+      
+      // Robust key extraction
+      const keyId = streamInfo.keyId || streamInfo.keyid || streamInfo.k_id;
+      const decryptionKey = streamInfo.key || streamInfo.k || streamInfo.decryption_key;
+      
+      let finalUrl = streamInfo.url;
+      
+      // Use proxy ONLY for domains that STRICTLY require specific headers (workers.dev)
+      if (finalUrl && finalUrl.includes('workers.dev')) {
+        finalUrl = `${PROXY_PATH}?url=${encodeURIComponent(finalUrl)}`;
+      }
+
+      return {
+        ...streamInfo,
+        url: finalUrl,
+        keyId: keyId,
+        key: decryptionKey
+      };
     } catch (err) {
       console.error("Fetch stream error:", err);
       throw err;

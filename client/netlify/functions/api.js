@@ -49,7 +49,6 @@ exports.handler = async (event, context) => {
   const path = event.path;
   const method = event.httpMethod;
 
-  // Add CORS headers
   const headers = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'Content-Type, Authorization',
@@ -62,11 +61,9 @@ exports.handler = async (event, context) => {
   }
 
   try {
-    // 1. Get Token
     const tokenData = await httpsRequest('https://api.iyad.space/token', { headers: HEADERS });
     const token = tokenData.token;
 
-    // 2. Get Key
     const keyData = await httpsRequest('https://api.iyad.space/key', {
       headers: { ...HEADERS, 'Authorization': `Bearer ${token}` }
     });
@@ -79,7 +76,11 @@ exports.handler = async (event, context) => {
       });
       const channels = decryptIyadData(dataJson.data, key);
       
-      const formatted = channels.filter(c => c.enabled !== false).map((c, index) => {
+      const formatted = channels.filter(c => {
+        if (c.enabled !== false) return true;
+        const name = (c.name || '').toLowerCase();
+        return name.includes('gma') || name.includes('kapamilya');
+      }).map((c, index) => {
         const sources = [{ name: c.alt_name || "Stream 1", index: 0 }];
         for (let i = 2; i <= 10; i++) {
           if (c[`alt_name${i}`]) sources.push({ name: c[`alt_name${i}`], index: i });
@@ -105,6 +106,47 @@ exports.handler = async (event, context) => {
       });
       const streamInfo = decryptIyadData(playData.data, key);
       return { statusCode: 200, headers, body: JSON.stringify(streamInfo) };
+    }
+
+    // Route: Proxy
+    if (path.includes('/proxy')) {
+      const targetUrl = event.queryStringParameters.url;
+      if (!targetUrl) return { statusCode: 400, headers, body: 'URL required' };
+
+      return new Promise((resolve) => {
+        const targetReq = https.request(targetUrl, { headers: HEADERS }, (targetRes) => {
+          let chunks = [];
+          targetRes.on('data', (chunk) => chunks.push(chunk));
+          targetRes.on('end', () => {
+            let body = Buffer.concat(chunks);
+            
+            // Rewrite relative URLs for HLS manifests
+            if (targetUrl.includes('.m3u8')) {
+              let text = body.toString('utf-8');
+              const baseUrl = targetUrl.substring(0, targetUrl.lastIndexOf('/') + 1);
+              text = text.split('\n').map(line => {
+                if (line.trim() && !line.startsWith('http') && !line.startsWith('#')) {
+                  return baseUrl + line;
+                }
+                return line;
+              }).join('\n');
+              body = Buffer.from(text, 'utf-8');
+            }
+
+            resolve({
+              statusCode: targetRes.statusCode,
+              headers: {
+                ...headers,
+                'Content-Type': targetRes.headers['content-type'] || 'application/octet-stream'
+              },
+              body: body.toString('base64'),
+              isBase64Encoded: true
+            });
+          });
+        });
+        targetReq.on('error', (e) => resolve({ statusCode: 500, headers, body: e.message }));
+        targetReq.end();
+      });
     }
 
     return { statusCode: 404, headers, body: JSON.stringify({ error: 'Not Found' }) };
