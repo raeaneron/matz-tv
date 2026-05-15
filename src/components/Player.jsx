@@ -1,10 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { X, AlertCircle, Loader2, Play } from 'lucide-react';
-import Hls from 'hls.js';
+import { X, AlertCircle, Loader2, RefreshCw } from 'lucide-react';
 
 export default function Player({ source, channelName, onClose }) {
   const videoRef = useRef(null);
-  const hlsRef = useRef(null);
+  const playerRef = useRef(null);
   const [error, setError] = useState(null);
   const [isBuffering, setIsBuffering] = useState(true);
 
@@ -15,83 +14,84 @@ export default function Player({ source, channelName, onClose }) {
     setError(null);
     setIsBuffering(true);
 
-    // Clean up previous Hls instance
-    if (hlsRef.current) {
-      hlsRef.current.destroy();
-      hlsRef.current = null;
-    }
-
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-    const isLegacyIOS = isIOS && (
-      /OS 10_/.test(navigator.userAgent) || 
-      /OS 9_/.test(navigator.userAgent) ||
-      /OS 11_/.test(navigator.userAgent)
-    );
     
-    // Check for DASH/MPD incompatibility on legacy iOS
-    if (source.type === 'mpd' && isLegacyIOS) {
-      setError("This channel uses DASH (MPD) which is not supported on older iPads. Please try GTV or a different channel.");
-      setIsBuffering(false);
-      return;
-    }
-
-    // For iPad 4 (iOS 10) and other iOS devices, native HLS is much more reliable than hls.js
-    if (isIOS || video.canPlayType('application/vnd.apple.mpegurl')) {
-      console.log("Using native HLS playback");
-      video.src = source.url;
-      
-      const handleLoaded = () => {
-        setIsBuffering(false);
-        video.play().catch(e => console.log("Native play prevented", e));
-      };
-      
-      const handleError = (e) => {
-        console.error("Native playback error", e);
-        if (source.type === 'mpd') {
-          setError("DASH (MPD) streams are not supported on this device.");
-        } else {
-          setError("Stream unavailable or incompatible. Try a different server.");
+    // Cleanup function
+    const cleanup = async () => {
+      if (playerRef.current) {
+        try {
+          await playerRef.current.destroy();
+        } catch (e) {
+          console.error("Cleanup error", e);
         }
-        setIsBuffering(false);
-      };
+        playerRef.current = null;
+      }
+    };
 
-      video.addEventListener('loadedmetadata', handleLoaded);
-      video.addEventListener('error', handleError);
-      
-      return () => {
-        video.removeEventListener('loadedmetadata', handleLoaded);
-        video.removeEventListener('error', handleError);
-      };
-    } 
-    // Fallback to Hls.js for Chrome/Firefox/etc.
-    else if (Hls.isSupported()) {
-      console.log("Using Hls.js playback");
-      const hls = new Hls({
-        enableWorker: false, // Workers might fail on old browsers
-        lowLatencyMode: true,
-      });
-      hlsRef.current = hls;
-      hls.loadSource(source.url);
-      hls.attachMedia(video);
-      hls.on(Hls.Events.MANIFEST_PARSED, () => {
-        video.play().catch(e => console.log("HLS play prevented", e));
-        setIsBuffering(false);
-      });
-      hls.on(Hls.Events.ERROR, (event, data) => {
-        if (data.fatal) {
-          setError("Failed to load stream. Please try another server.");
+    const initPlayer = async () => {
+      // 1. Try Shaka Player for DASH and DRM support (Most robust, like iYAD TV)
+      if (window.shaka && window.shaka.Player.isBrowserSupported()) {
+        const shakaPlayer = new window.shaka.Player(video);
+        playerRef.current = shakaPlayer;
+
+        // Configure ClearKey DRM if keys are present
+        if (source.key && source.keyId) {
+          shakaPlayer.configure({
+            drm: {
+              clearKeys: {
+                [source.keyId]: source.key
+              }
+            }
+          });
+        }
+
+        shakaPlayer.addEventListener('error', (event) => {
+          console.error('Shaka Error:', event.detail);
+          if (event.detail.code === 1001) return; // Ignore some non-fatal errors
+          setError(`Player Error (${event.detail.code})`);
           setIsBuffering(false);
+        });
+
+        try {
+          await shakaPlayer.load(source.url);
+          setIsBuffering(false);
+          video.play().catch(e => console.log("Shaka play prevented", e));
+          return;
+        } catch (e) {
+          console.error('Shaka Load Error:', e);
+          // Fall through to native if Shaka fails
         }
-      });
-    } else {
-      setError("Your browser does not support this video format.");
-      setIsBuffering(false);
-    }
+      }
+
+      // 2. Fallback to Native HLS (Essential for iPad 4 / iOS 10)
+      if (video.canPlayType('application/vnd.apple.mpegurl')) {
+        console.log("Using native HLS fallback");
+        video.src = source.url;
+        
+        video.onloadedmetadata = () => {
+          setIsBuffering(false);
+          video.play().catch(e => console.log("Native play prevented", e));
+        };
+        
+        video.onerror = () => {
+          console.error("Native error", video.error);
+          if (source.type === 'mpd') {
+            setError("DASH (MPD) format is not supported on this device. Try a different server.");
+          } else {
+            setError("Stream unavailable or incompatible with this device.");
+          }
+          setIsBuffering(false);
+        };
+      } else {
+        setError("Your browser does not support this stream format.");
+        setIsBuffering(false);
+      }
+    };
+
+    initPlayer();
 
     return () => {
-      if (hlsRef.current) {
-        hlsRef.current.destroy();
-      }
+      cleanup();
     };
   }, [source]);
 
@@ -100,7 +100,7 @@ export default function Player({ source, channelName, onClose }) {
       {/* Header */}
       <div className="absolute top-0 left-0 right-0 z-30 flex items-center justify-between p-3 bg-gradient-to-b from-black/80 to-transparent">
         <div className="flex items-center gap-2">
-           <div className="px-1.5 py-0.5 bg-red-600 text-white font-bold rounded text-[9px] uppercase tracking-tighter">
+           <div className="px-1.5 py-0.5 bg-red-600 text-white font-bold rounded text-[9px] uppercase tracking-tighter shadow-sm">
              LIVE
            </div>
            <span className="text-white font-bold text-xs truncate max-w-[200px]">
@@ -123,15 +123,16 @@ export default function Player({ source, channelName, onClose }) {
         )}
 
         {error && (
-          <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-zinc-900 px-4 text-center">
-            <AlertCircle className="w-8 h-8 text-red-500 mb-2" />
-            <h3 className="text-sm font-bold text-white mb-1">Playback Error</h3>
-            <p className="text-zinc-500 text-[10px] max-w-[200px] mb-4">{error}</p>
+          <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-[#0a0a0a] px-6 text-center">
+            <AlertCircle className="w-10 h-10 text-red-500 mb-4" />
+            <h3 className="text-sm font-bold text-white mb-2">Playback Failed</h3>
+            <p className="text-zinc-500 text-[10px] sm:text-xs max-w-[250px] mb-6 leading-relaxed">{error}</p>
             <button 
               onClick={() => window.location.reload()}
-              className="px-4 py-1.5 bg-red-600 rounded-lg text-xs font-bold transition active:scale-95"
+              className="flex items-center px-5 py-2 bg-red-600 hover:bg-red-700 rounded-lg text-xs font-bold transition active:scale-95 shadow-lg"
             >
-              RETRY
+              <RefreshCw className="w-3 h-3 mr-2" />
+              REFRESH PLAYER
             </button>
           </div>
         )}
@@ -141,7 +142,7 @@ export default function Player({ source, channelName, onClose }) {
           controls 
           autoPlay 
           playsInline
-          webkit-playsinline="true"
+          referrerPolicy="no-referrer"
           className="w-full h-full"
           style={{ backgroundColor: 'black' }}
         />
