@@ -57,6 +57,18 @@ export default function Player({ source, channelName, onClose, availableSources,
       // STRATEGY 1: DASH or DRM Streams (Requires Shaka Player)
       if (actualType === 'mpd' || hasDrm) {
         if (!window.shaka || !window.shaka.Player.isBrowserSupported()) {
+          // AUTO-FALLBACK: If this device doesn't support DASH/DRM (e.g., iPad 4), 
+          // automatically try the next server if available.
+          if (availableSources && availableSources.length > 1) {
+             const currentIndex = availableSources.findIndex(s => s.name === source.name);
+             const nextSource = availableSources.find((s, idx) => idx > currentIndex) || availableSources[0];
+             if (nextSource && nextSource.name !== source.name) {
+                console.log("Browser doesn't support DASH, auto-switching to:", nextSource.name);
+                onSwitchSource(nextSource);
+                return;
+             }
+          }
+          
           setError("Your browser does not support DASH or DRM streams.");
           setIsBuffering(false);
           return;
@@ -94,6 +106,18 @@ export default function Player({ source, channelName, onClose, availableSources,
           video.play().catch(e => console.log("Autoplay blocked"));
         } catch (e) {
           console.error("Shaka Load Error", e);
+          
+          // AUTO-FALLBACK on Load Error for DRM
+          if ((e.code === 6007 || e.code === 6001) && availableSources && availableSources.length > 1) {
+             const currentIndex = availableSources.findIndex(s => s.name === source.name);
+             const nextSource = availableSources.find((s, idx) => idx > currentIndex) || availableSources[0];
+             if (nextSource && nextSource.name !== source.name) {
+                console.log("DRM error, auto-switching to:", nextSource.name);
+                onSwitchSource(nextSource);
+                return;
+             }
+          }
+
           if (e.code === 6007 || e.code === 6001) {
              setIsDrmError(true);
              setError("DRM Protected: Encryption not supported here.");
@@ -193,16 +217,16 @@ export default function Player({ source, channelName, onClose, availableSources,
             <h3 className="text-sm font-bold text-white mb-2">{isDrmError ? 'DRM Protected' : 'Playback Failed'}</h3>
             <p className="text-zinc-500 text-[10px] sm:text-xs max-w-[300px] mb-6 leading-relaxed font-mono">{error}</p>
             
-            <div className="flex flex-col gap-3 w-full max-w-[240px]">
+            <div className="flex flex-col w-full max-w-[240px]">
                {availableSources && availableSources.length > 1 && (
-                 <div className="flex flex-col gap-2">
-                   <p className="text-[9px] text-zinc-600 uppercase font-bold tracking-widest">Try another server:</p>
-                   <div className="grid grid-cols-2 gap-2">
+                 <div className="flex flex-col mb-3">
+                   <p className="text-[9px] text-zinc-600 uppercase font-bold tracking-widest mb-2">Try another server:</p>
+                   <div className="grid grid-cols-2">
                      {availableSources.filter(s => s.name !== source.name).slice(0, 4).map((s, idx) => (
                        <button 
                          key={idx}
                          onClick={() => onSwitchSource(s)}
-                         className="px-2 py-2 bg-red-600/10 hover:bg-red-600 border border-red-500/20 rounded text-[9px] font-bold transition active:scale-95 text-red-500 hover:text-white"
+                         className="px-2 py-2 m-1 bg-red-600/10 hover:bg-red-600 border border-red-500/20 rounded text-[9px] font-bold transition active:scale-95 text-red-500 hover:text-white"
                        >
                          {s.name}
                        </button>
@@ -210,7 +234,7 @@ export default function Player({ source, channelName, onClose, availableSources,
                    </div>
                  </div>
                )}
-               <button onClick={onClose} className="px-5 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-xs font-bold transition active:scale-95 shadow-lg border border-white/5">
+               <button onClick={onClose} className="px-5 py-2 mt-2 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-xs font-bold transition active:scale-95 shadow-lg border border-white/5">
                  BACK TO LIST
                </button>
             </div>
