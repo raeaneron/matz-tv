@@ -139,7 +139,11 @@ app.get('/api/proxy', async (req, res) => {
 
     if (!response.ok) return res.status(response.status).send('Proxy fetch failed');
 
-    const contentType = response.headers.get('content-type');
+    let contentType = response.headers.get('content-type') || 'application/octet-stream';
+    if (url.includes('.m3u8')) contentType = 'application/vnd.apple.mpegurl';
+    else if (url.includes('.ts')) contentType = 'video/MP2T';
+    else if (url.includes('.mpd')) contentType = 'application/dash+xml';
+
     res.setHeader('Content-Type', contentType);
     res.setHeader('Access-Control-Allow-Origin', '*');
 
@@ -156,7 +160,8 @@ app.get('/api/proxy', async (req, res) => {
             const absoluteUrl = line.startsWith('http') ? line : baseUrl + line;
             const host = req.get('host');
             const protocol = req.protocol || 'http';
-            return `${protocol}://${host}/api/proxy?url=${encodeURIComponent(absoluteUrl)}`;
+            const ext = absoluteUrl.includes('.m3u8') ? '/stream.m3u8' : (absoluteUrl.includes('.ts') ? '/stream.ts' : '');
+            return `${protocol}://${host}/api/proxy${ext}?url=${encodeURIComponent(absoluteUrl)}`;
           }
           // Also rewrite URI="..." within tags like EXT-X-KEY or EXT-X-MEDIA
           if (line.includes('URI="')) {
@@ -164,7 +169,8 @@ app.get('/api/proxy', async (req, res) => {
                  const absoluteUrl = p1.startsWith('http') ? p1 : baseUrl + p1;
                  const host = req.get('host');
                  const protocol = req.protocol || 'http';
-                 return `URI="${protocol}://${host}/api/proxy?url=${encodeURIComponent(absoluteUrl)}"`;
+                 const ext = absoluteUrl.includes('.m3u8') ? '/stream.m3u8' : '';
+                 return `URI="${protocol}://${host}/api/proxy${ext}?url=${encodeURIComponent(absoluteUrl)}"`;
              });
           }
           return line;

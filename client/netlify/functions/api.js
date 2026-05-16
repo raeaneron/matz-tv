@@ -96,7 +96,11 @@ exports.handler = async (event, context) => {
         return { statusCode: response.status, headers, body: 'Proxy fetch failed' };
       }
 
-      const contentType = response.headers.get('content-type') || 'application/octet-stream';
+      let contentType = response.headers.get('content-type') || 'application/octet-stream';
+      if (targetUrl.includes('.m3u8')) contentType = 'application/vnd.apple.mpegurl';
+      else if (targetUrl.includes('.ts')) contentType = 'video/MP2T';
+      else if (targetUrl.includes('.mpd')) contentType = 'application/dash+xml';
+
       const responseHeaders = { ...headers, 'Content-Type': contentType };
 
       if (targetUrl.includes('.m3u8') || targetUrl.includes('.mpd')) {
@@ -111,13 +115,15 @@ exports.handler = async (event, context) => {
             // Rewrite segment URIs
             if (line.trim() && !line.startsWith('#')) {
               const absoluteUrl = line.startsWith('http') ? line : baseUrl + line;
-              return `${protocol}://${host}/.netlify/functions/api/proxy?url=${encodeURIComponent(absoluteUrl)}`;
+              const ext = absoluteUrl.includes('.m3u8') ? '/stream.m3u8' : (absoluteUrl.includes('.ts') ? '/stream.ts' : '');
+              return `${protocol}://${host}/.netlify/functions/api/proxy${ext}?url=${encodeURIComponent(absoluteUrl)}`;
             }
             // Rewrite URI attributes
             if (line.includes('URI="')) {
               return line.replace(/URI="([^"]+)"/, (match, p1) => {
                  const absoluteUrl = p1.startsWith('http') ? p1 : baseUrl + p1;
-                 return `URI="${protocol}://${host}/.netlify/functions/api/proxy?url=${encodeURIComponent(absoluteUrl)}"`;
+                 const ext = absoluteUrl.includes('.m3u8') ? '/stream.m3u8' : '';
+                 return `URI="${protocol}://${host}/.netlify/functions/api/proxy${ext}?url=${encodeURIComponent(absoluteUrl)}"`;
               });
             }
             return line;

@@ -107,7 +107,8 @@ export const iptvService = {
       );
 
       if (needsProxy) {
-        finalUrl = `${PROXY_PATH}?url=${encodeURIComponent(finalUrl)}`;
+        const ext = finalUrl.includes('.m3u8') ? '/stream.m3u8' : (finalUrl.includes('.mpd') ? '/stream.mpd' : '');
+        finalUrl = `${PROXY_PATH}${ext}?url=${encodeURIComponent(finalUrl)}`;
       }
 
       return {
