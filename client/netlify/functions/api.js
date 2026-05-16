@@ -58,9 +58,13 @@ exports.handler = async (event, context) => {
         const name = (c.name || '').toLowerCase();
         return name.includes('gma') || name.includes('kapamilya');
       }).map((c, index) => {
-        const sources = [{ name: c.alt_name || "Stream 1", index: 0 }];
-        for (let i = 2; i <= 10; i++) {
-          if (c[`alt_name${i}`]) sources.push({ name: c[`alt_name${i}`], index: i });
+        const sources = [
+          { name: c.alt_name || "Stream 1", index: 0 },
+          { name: c.alt_name2 || "Stream 2", index: 1 },
+          { name: c.alt_name3 || "Stream 3", index: 2 }
+        ];
+        for (let i = 4; i <= 10; i++) {
+          if (c[`alt_name${i}`]) sources.push({ name: c[`alt_name${i}`], index: i - 1 });
         }
         return {
           id: index + 1,
