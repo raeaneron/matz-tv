@@ -18,6 +18,9 @@ function detectStreamType(url, hintType) {
   return hintType || 'hls';
 }
 
+let globalLastChannelName = "";
+let globalTriedSources = new Set();
+
 export default function Player({ source, channelName, onClose, availableSources, onSwitchSource }) {
   const videoRef = useRef(null);
   const playerInstanceRef = useRef(null);
@@ -26,7 +29,11 @@ export default function Player({ source, channelName, onClose, availableSources,
   const [isBuffering, setIsBuffering] = useState(true);
   const [showDebug, setShowDebug] = useState(false);
 
-  const triedSourcesRef = useRef(new Set());
+  // Reset global cache if channel changes
+  if (channelName !== globalLastChannelName) {
+    globalTriedSources.clear();
+    globalLastChannelName = channelName;
+  }
 
   useEffect(() => {
     if (!source || !videoRef.current) return;
@@ -36,7 +43,7 @@ export default function Player({ source, channelName, onClose, availableSources,
     setIsDrmError(false);
     setIsBuffering(true);
 
-    triedSourcesRef.current.add(source.name);
+    globalTriedSources.add(source.name);
 
     const actualType = detectStreamType(source.url, source.type);
     const hasDrm = !!(source.key && source.keyId);
@@ -54,7 +61,7 @@ export default function Player({ source, channelName, onClose, availableSources,
 
     const tryFallback = (errorMsg, isDrm = false) => {
       if (availableSources && availableSources.length > 1) {
-         const nextSource = availableSources.find(s => !triedSourcesRef.current.has(s.name));
+         const nextSource = availableSources.find(s => !globalTriedSources.has(s.name));
          if (nextSource) {
             console.log("Stream error, auto-switching to:", nextSource.name);
             onSwitchSource(nextSource);
@@ -156,14 +163,25 @@ export default function Player({ source, channelName, onClose, availableSources,
         // Native fallback (Safari / iOS 10 iPad 4)
         if (supportsNativeHls) {
           video.src = source.url;
-          video.addEventListener('loadedmetadata', () => {
+          
+          const handleLoaded = () => {
              setIsBuffering(false);
              video.play().catch(e => console.log("Autoplay blocked"));
-          });
-          video.addEventListener('error', () => {
+          };
+          const handleError = () => {
              console.error("Native Video Error", video.error);
              tryFallback("Stream unavailable or incompatible with this device.");
-          });
+          };
+          
+          video.addEventListener('loadedmetadata', handleLoaded);
+          video.addEventListener('error', handleError);
+          
+          playerInstanceRef.current = {
+             destroy: () => {
+                video.removeEventListener('loadedmetadata', handleLoaded);
+                video.removeEventListener('error', handleError);
+             }
+          };
           return;
         }
       }
