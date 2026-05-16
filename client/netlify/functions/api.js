@@ -120,13 +120,25 @@ exports.handler = async (event, context) => {
           targetRes.on('end', () => {
             let body = Buffer.concat(chunks);
             
-            // Rewrite relative URLs for HLS manifests
+            // Rewrite relative URLs for HLS manifests to pass through the proxy
             if (targetUrl.includes('.m3u8')) {
               let text = body.toString('utf-8');
               const baseUrl = targetUrl.substring(0, targetUrl.lastIndexOf('/') + 1);
+              const host = event.headers.host;
+              const protocol = event.headers['x-forwarded-proto'] || 'https';
+              
               text = text.split('\n').map(line => {
-                if (line.trim() && !line.startsWith('http') && !line.startsWith('#')) {
-                  return baseUrl + line;
+                // Rewrite segment URIs
+                if (line.trim() && !line.startsWith('#')) {
+                  const absoluteUrl = line.startsWith('http') ? line : baseUrl + line;
+                  return `${protocol}://${host}/.netlify/functions/api/proxy?url=${encodeURIComponent(absoluteUrl)}`;
+                }
+                // Rewrite URI attributes
+                if (line.includes('URI="')) {
+                  return line.replace(/URI="([^"]+)"/, (match, p1) => {
+                     const absoluteUrl = p1.startsWith('http') ? p1 : baseUrl + p1;
+                     return `URI="${protocol}://${host}/.netlify/functions/api/proxy?url=${encodeURIComponent(absoluteUrl)}"`;
+                  });
                 }
                 return line;
               }).join('\n');

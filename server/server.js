@@ -143,17 +143,28 @@ app.get('/api/proxy', async (req, res) => {
     res.setHeader('Content-Type', contentType);
     res.setHeader('Access-Control-Allow-Origin', '*');
 
-    // For manifests, we need to rewrite relative URLs to absolute ones
+    // For manifests, we need to rewrite URLs to point to our proxy
     if (url.includes('.m3u8') || url.includes('.mpd')) {
       let text = await response.text();
       const baseUrl = url.substring(0, url.lastIndexOf('/') + 1);
       
-      // Basic rewrite for HLS and DASH manifests
-      // This is a simple regex that finds lines that don't start with http or #
       if (url.includes('.m3u8')) {
         text = text.split('\n').map(line => {
-          if (line.trim() && !line.startsWith('http') && !line.startsWith('#')) {
-            return baseUrl + line;
+          // Rewrite segment URIs to go through the proxy
+          if (line.trim() && !line.startsWith('#')) {
+            const absoluteUrl = line.startsWith('http') ? line : baseUrl + line;
+            const host = req.get('host');
+            const protocol = req.protocol || 'http';
+            return `${protocol}://${host}/api/proxy?url=${encodeURIComponent(absoluteUrl)}`;
+          }
+          // Also rewrite URI="..." within tags like EXT-X-KEY or EXT-X-MEDIA
+          if (line.includes('URI="')) {
+             return line.replace(/URI="([^"]+)"/, (match, p1) => {
+                 const absoluteUrl = p1.startsWith('http') ? p1 : baseUrl + p1;
+                 const host = req.get('host');
+                 const protocol = req.protocol || 'http';
+                 return `URI="${protocol}://${host}/api/proxy?url=${encodeURIComponent(absoluteUrl)}"`;
+             });
           }
           return line;
         }).join('\n');

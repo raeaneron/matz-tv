@@ -21,6 +21,8 @@ export default function Player({ source, channelName, onClose, availableSources,
   const [isBuffering, setIsBuffering] = useState(true);
   const [showDebug, setShowDebug] = useState(false);
 
+  const triedSourcesRef = useRef(new Set());
+
   useEffect(() => {
     if (!source || !videoRef.current) return;
 
@@ -28,6 +30,8 @@ export default function Player({ source, channelName, onClose, availableSources,
     setError(null);
     setIsDrmError(false);
     setIsBuffering(true);
+
+    triedSourcesRef.current.add(source.name);
 
     const actualType = detectStreamType(source.url, source.type);
     const hasDrm = !!(source.key && source.keyId);
@@ -41,6 +45,20 @@ export default function Player({ source, channelName, onClose, availableSources,
       }
       video.removeAttribute('src');
       video.load();
+    };
+
+    const tryFallback = (errorMsg, isDrm = false) => {
+      if (availableSources && availableSources.length > 1) {
+         const nextSource = availableSources.find(s => !triedSourcesRef.current.has(s.name));
+         if (nextSource) {
+            console.log("Stream error, auto-switching to:", nextSource.name);
+            onSwitchSource(nextSource);
+            return;
+         }
+      }
+      setIsDrmError(isDrm);
+      setError(errorMsg);
+      setIsBuffering(false);
     };
 
     const initPlayer = async () => {
@@ -57,20 +75,7 @@ export default function Player({ source, channelName, onClose, availableSources,
       // STRATEGY 1: DASH or DRM Streams (Requires Shaka Player)
       if (actualType === 'mpd' || hasDrm) {
         if (!window.shaka || !window.shaka.Player.isBrowserSupported()) {
-          // AUTO-FALLBACK: If this device doesn't support DASH/DRM (e.g., iPad 4), 
-          // automatically try the next server if available.
-          if (availableSources && availableSources.length > 1) {
-             const currentIndex = availableSources.findIndex(s => s.name === source.name);
-             const nextSource = availableSources.find((s, idx) => idx > currentIndex) || availableSources[0];
-             if (nextSource && nextSource.name !== source.name) {
-                console.log("Browser doesn't support DASH, auto-switching to:", nextSource.name);
-                onSwitchSource(nextSource);
-                return;
-             }
-          }
-          
-          setError("Your browser does not support DASH or DRM streams.");
-          setIsBuffering(false);
+          tryFallback("Your browser does not support DASH or DRM streams.");
           return;
         }
 
@@ -92,12 +97,10 @@ export default function Player({ source, channelName, onClose, availableSources,
           const err = event.detail;
           console.error("Shaka Player Error:", err);
           if (err.code === 6007 || err.code === 6001 || err.code === 6000) {
-             setIsDrmError(true);
-             setError("DRM Protected: This device does not support the required encryption.");
+             tryFallback("DRM Protected: Encryption not supported here.", true);
           } else {
-             setError(`Playback Failed (Error Code: ${err.code}). Stream might be offline.`);
+             tryFallback(`Playback Failed (Error Code: ${err.code}). Stream might be offline.`);
           }
-          setIsBuffering(false);
         });
 
         try {
@@ -106,25 +109,11 @@ export default function Player({ source, channelName, onClose, availableSources,
           video.play().catch(e => console.log("Autoplay blocked"));
         } catch (e) {
           console.error("Shaka Load Error", e);
-          
-          // AUTO-FALLBACK on Load Error for DRM
-          if ((e.code === 6007 || e.code === 6001) && availableSources && availableSources.length > 1) {
-             const currentIndex = availableSources.findIndex(s => s.name === source.name);
-             const nextSource = availableSources.find((s, idx) => idx > currentIndex) || availableSources[0];
-             if (nextSource && nextSource.name !== source.name) {
-                console.log("DRM error, auto-switching to:", nextSource.name);
-                onSwitchSource(nextSource);
-                return;
-             }
-          }
-
           if (e.code === 6007 || e.code === 6001) {
-             setIsDrmError(true);
-             setError("DRM Protected: Encryption not supported here.");
+             tryFallback("DRM Protected: Encryption not supported here.", true);
           } else {
-             setError(`Failed to load stream (Code ${e.code}).`);
+             tryFallback(`Failed to load stream (Code ${e.code}).`);
           }
-          setIsBuffering(false);
         }
         return;
       }
@@ -153,8 +142,7 @@ export default function Player({ source, channelName, onClose, availableSources,
           hls.on(Hls.Events.ERROR, (event, data) => {
             if (data.fatal) {
               console.error("HLS.js Fatal Error:", data);
-              setError("Stream unavailable. It might be blocked or offline.");
-              setIsBuffering(false);
+              tryFallback("Stream unavailable. It might be blocked or offline.");
             }
           });
           return;
@@ -169,15 +157,14 @@ export default function Player({ source, channelName, onClose, availableSources,
           });
           video.addEventListener('error', () => {
              console.error("Native Video Error", video.error);
-             setError("Stream unavailable or incompatible with this device.");
-             setIsBuffering(false);
+             tryFallback("Stream unavailable or incompatible with this device.");
           });
           return;
         }
       }
 
-      setError("Unsupported stream format.");
-      setIsBuffering(false);
+      tryFallback("Unsupported stream format.");
+
     };
 
     // Delay slightly to ensure DOM is ready
