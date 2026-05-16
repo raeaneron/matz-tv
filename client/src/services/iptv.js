@@ -97,13 +97,12 @@ export const iptvService = {
       
       let finalUrl = streamInfo.url;
       
-      // Proxy HLS streams and restricted domains to ensure headers (Referer, Origin) are sent,
+      // Proxy HLS streams from known restricted domains to ensure headers (Referer, Origin) are sent,
       // which is critical for legacy devices (iPad 4, iOS 10) that do not send these natively.
       const needsProxy = finalUrl && (
         finalUrl.includes('workers.dev') || 
         finalUrl.includes('conv.iyad.space') || 
-        finalUrl.includes('alwaysdata.net') || 
-        finalUrl.includes('.m3u8')
+        finalUrl.includes('alwaysdata.net')
       );
 
       if (needsProxy) {

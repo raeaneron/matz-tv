@@ -158,15 +158,19 @@ app.get('/api/proxy', async (req, res) => {
           // Rewrite segment URIs to go through the proxy
           if (line.trim() && !line.startsWith('#')) {
             const absoluteUrl = line.startsWith('http') ? line : baseUrl + line;
+            if (absoluteUrl.includes('.ts')) {
+               return absoluteUrl;
+            }
             const host = req.get('host');
             const protocol = req.protocol || 'http';
-            const ext = absoluteUrl.includes('.m3u8') ? '/stream.m3u8' : (absoluteUrl.includes('.ts') ? '/stream.ts' : '');
+            const ext = absoluteUrl.includes('.m3u8') ? '/stream.m3u8' : '';
             return `${protocol}://${host}/api/proxy${ext}?url=${encodeURIComponent(absoluteUrl)}`;
           }
           // Also rewrite URI="..." within tags like EXT-X-KEY or EXT-X-MEDIA
           if (line.includes('URI="')) {
              return line.replace(/URI="([^"]+)"/, (match, p1) => {
                  const absoluteUrl = p1.startsWith('http') ? p1 : baseUrl + p1;
+                 if (absoluteUrl.includes('.ts')) return `URI="${absoluteUrl}"`;
                  const host = req.get('host');
                  const protocol = req.protocol || 'http';
                  const ext = absoluteUrl.includes('.m3u8') ? '/stream.m3u8' : '';

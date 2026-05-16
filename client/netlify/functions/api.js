@@ -115,15 +115,19 @@ exports.handler = async (event, context) => {
             // Rewrite segment URIs
             if (line.trim() && !line.startsWith('#')) {
               const absoluteUrl = line.startsWith('http') ? line : baseUrl + line;
-              const ext = absoluteUrl.includes('.m3u8') ? '/stream.m3u8' : (absoluteUrl.includes('.ts') ? '/stream.ts' : '');
-              return `${protocol}://${host}/.netlify/functions/api/proxy${ext}?url=${encodeURIComponent(absoluteUrl)}`;
+              if (absoluteUrl.includes('.ts')) {
+                return absoluteUrl; // Do NOT proxy TS chunks!
+              }
+              const ext = absoluteUrl.includes('.m3u8') ? '/stream.m3u8' : '';
+              return `${protocol}://${host}/api/proxy${ext}?url=${encodeURIComponent(absoluteUrl)}`;
             }
             // Rewrite URI attributes
             if (line.includes('URI="')) {
               return line.replace(/URI="([^"]+)"/, (match, p1) => {
                  const absoluteUrl = p1.startsWith('http') ? p1 : baseUrl + p1;
+                 if (absoluteUrl.includes('.ts')) return `URI="${absoluteUrl}"`;
                  const ext = absoluteUrl.includes('.m3u8') ? '/stream.m3u8' : '';
-                 return `URI="${protocol}://${host}/.netlify/functions/api/proxy${ext}?url=${encodeURIComponent(absoluteUrl)}"`;
+                 return `URI="${protocol}://${host}/api/proxy${ext}?url=${encodeURIComponent(absoluteUrl)}"`;
               });
             }
             return line;
