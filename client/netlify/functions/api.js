@@ -101,7 +101,8 @@ exports.handler = async (event, context) => {
 
       if (targetUrl.includes('.m3u8') || targetUrl.includes('.mpd')) {
         let text = await response.text();
-        const baseUrl = targetUrl.substring(0, targetUrl.lastIndexOf('/') + 1);
+        const finalUrl = response.url.split('?')[0];
+        const baseUrl = finalUrl.substring(0, finalUrl.lastIndexOf('/') + 1);
         const host = event.headers.host;
         const protocol = event.headers['x-forwarded-proto'] || 'https';
         

@@ -143,10 +143,11 @@ app.get('/api/proxy', async (req, res) => {
     res.setHeader('Content-Type', contentType);
     res.setHeader('Access-Control-Allow-Origin', '*');
 
-    // For manifests, we need to rewrite URLs to point to our proxy
     if (url.includes('.m3u8') || url.includes('.mpd')) {
       let text = await response.text();
-      const baseUrl = url.substring(0, url.lastIndexOf('/') + 1);
+      // Use response.url (after redirects) instead of original url
+      const finalUrl = response.url.split('?')[0];
+      const baseUrl = finalUrl.substring(0, finalUrl.lastIndexOf('/') + 1);
       
       if (url.includes('.m3u8')) {
         text = text.split('\n').map(line => {
