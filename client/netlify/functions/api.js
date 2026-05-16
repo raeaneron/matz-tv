@@ -1,37 +1,11 @@
 const crypto = require('crypto');
-const https = require('https');
 
 const HEADERS = {
-  'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+  'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
   'Accept': 'application/json',
   'Origin': 'https://iyadtv.pages.dev',
   'Referer': 'https://iyadtv.pages.dev/'
 };
-
-async function httpsRequest(url, options = {}) {
-  return new Promise((resolve, reject) => {
-    const req = https.request(url, options, (res) => {
-      let data = '';
-      res.on('data', (chunk) => data += chunk);
-      res.on('end', () => {
-        if (res.statusCode >= 200 && res.statusCode < 300) {
-          try {
-            resolve(JSON.parse(data));
-          } catch (e) {
-            resolve(data);
-          }
-        } else {
-          reject(new Error(`Status ${res.statusCode}: ${data}`));
-        }
-      });
-    });
-    req.on('error', (e) => reject(e));
-    if (options.body) {
-      req.write(options.body);
-    }
-    req.end();
-  });
-}
 
 function decryptIyadData(encryptedData, keyString) {
   const buffer = Buffer.from(encryptedData, 'base64');
@@ -61,19 +35,22 @@ exports.handler = async (event, context) => {
   }
 
   try {
-    const tokenData = await httpsRequest('https://api.iyad.space/token', { headers: HEADERS });
+    const tokenRes = await fetch('https://api.iyad.space/token', { headers: HEADERS });
+    const tokenData = await tokenRes.json();
     const token = tokenData.token;
 
-    const keyData = await httpsRequest('https://api.iyad.space/key', {
+    const keyRes = await fetch('https://api.iyad.space/key', {
       headers: { ...HEADERS, 'Authorization': `Bearer ${token}` }
     });
+    const keyData = await keyRes.json();
     const key = keyData.key;
 
     // Route: Channels
     if (path.endsWith('/channels')) {
-      const dataJson = await httpsRequest('https://api.iyad.space/data', {
+      const dataRes = await fetch('https://api.iyad.space/data', {
         headers: { ...HEADERS, 'Authorization': `Bearer ${token}` }
       });
+      const dataJson = await dataRes.json();
       const channels = decryptIyadData(dataJson.data, key);
       
       const formatted = channels.filter(c => {
@@ -99,11 +76,12 @@ exports.handler = async (event, context) => {
     // Route: Stream
     if (path.endsWith('/stream') && method === 'POST') {
       const { channelName, serverIndex } = JSON.parse(event.body);
-      const playData = await httpsRequest('https://api.iyad.space/play', {
+      const playRes = await fetch('https://api.iyad.space/play', {
         method: 'POST',
         headers: { ...HEADERS, 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({ channelName, serverIndex: serverIndex || 0 })
       });
+      const playData = await playRes.json();
       const streamInfo = decryptIyadData(playData.data, key);
       return { statusCode: 200, headers, body: JSON.stringify(streamInfo) };
     }
@@ -113,52 +91,52 @@ exports.handler = async (event, context) => {
       const targetUrl = event.queryStringParameters.url;
       if (!targetUrl) return { statusCode: 400, headers, body: 'URL required' };
 
-      return new Promise((resolve) => {
-        const targetReq = https.request(targetUrl, { headers: HEADERS }, (targetRes) => {
-          let chunks = [];
-          targetRes.on('data', (chunk) => chunks.push(chunk));
-          targetRes.on('end', () => {
-            let body = Buffer.concat(chunks);
-            
-            // Rewrite relative URLs for HLS manifests to pass through the proxy
-            if (targetUrl.includes('.m3u8')) {
-              let text = body.toString('utf-8');
-              const baseUrl = targetUrl.substring(0, targetUrl.lastIndexOf('/') + 1);
-              const host = event.headers.host;
-              const protocol = event.headers['x-forwarded-proto'] || 'https';
-              
-              text = text.split('\n').map(line => {
-                // Rewrite segment URIs
-                if (line.trim() && !line.startsWith('#')) {
-                  const absoluteUrl = line.startsWith('http') ? line : baseUrl + line;
-                  return `${protocol}://${host}/.netlify/functions/api/proxy?url=${encodeURIComponent(absoluteUrl)}`;
-                }
-                // Rewrite URI attributes
-                if (line.includes('URI="')) {
-                  return line.replace(/URI="([^"]+)"/, (match, p1) => {
-                     const absoluteUrl = p1.startsWith('http') ? p1 : baseUrl + p1;
-                     return `URI="${protocol}://${host}/.netlify/functions/api/proxy?url=${encodeURIComponent(absoluteUrl)}"`;
-                  });
-                }
-                return line;
-              }).join('\n');
-              body = Buffer.from(text, 'utf-8');
-            }
+      const response = await fetch(targetUrl, { headers: HEADERS });
+      if (!response.ok) {
+        return { statusCode: response.status, headers, body: 'Proxy fetch failed' };
+      }
 
-            resolve({
-              statusCode: targetRes.statusCode,
-              headers: {
-                ...headers,
-                'Content-Type': targetRes.headers['content-type'] || 'application/octet-stream'
-              },
-              body: body.toString('base64'),
-              isBase64Encoded: true
-            });
-          });
-        });
-        targetReq.on('error', (e) => resolve({ statusCode: 500, headers, body: e.message }));
-        targetReq.end();
-      });
+      const contentType = response.headers.get('content-type') || 'application/octet-stream';
+      const responseHeaders = { ...headers, 'Content-Type': contentType };
+
+      if (targetUrl.includes('.m3u8') || targetUrl.includes('.mpd')) {
+        let text = await response.text();
+        const baseUrl = targetUrl.substring(0, targetUrl.lastIndexOf('/') + 1);
+        const host = event.headers.host;
+        const protocol = event.headers['x-forwarded-proto'] || 'https';
+        
+        if (targetUrl.includes('.m3u8')) {
+          text = text.split('\n').map(line => {
+            // Rewrite segment URIs
+            if (line.trim() && !line.startsWith('#')) {
+              const absoluteUrl = line.startsWith('http') ? line : baseUrl + line;
+              return `${protocol}://${host}/.netlify/functions/api/proxy?url=${encodeURIComponent(absoluteUrl)}`;
+            }
+            // Rewrite URI attributes
+            if (line.includes('URI="')) {
+              return line.replace(/URI="([^"]+)"/, (match, p1) => {
+                 const absoluteUrl = p1.startsWith('http') ? p1 : baseUrl + p1;
+                 return `URI="${protocol}://${host}/.netlify/functions/api/proxy?url=${encodeURIComponent(absoluteUrl)}"`;
+              });
+            }
+            return line;
+          }).join('\n');
+        }
+        
+        return {
+          statusCode: 200,
+          headers: responseHeaders,
+          body: text
+        };
+      } else {
+        const buffer = await response.arrayBuffer();
+        return {
+          statusCode: 200,
+          headers: responseHeaders,
+          body: Buffer.from(buffer).toString('base64'),
+          isBase64Encoded: true
+        };
+      }
     }
 
     return { statusCode: 404, headers, body: JSON.stringify({ error: 'Not Found' }) };

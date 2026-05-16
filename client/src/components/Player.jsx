@@ -4,10 +4,15 @@ import Hls from 'hls.js';
 
 function detectStreamType(url, hintType) {
   if (!url) return hintType || 'hls';
-  const lower = url.toLowerCase().split('?')[0];
-  if (lower.endsWith('.m3u8')) return 'hls';
-  if (lower.endsWith('.mpd')) return 'mpd';
-  // Check if hintType is mpd or dash
+  
+  // Decode URL in case it is wrapped in a proxy (e.g. /api/proxy?url=...)
+  let checkUrl = url;
+  try { checkUrl = decodeURIComponent(url); } catch (e) {}
+
+  const lower = checkUrl.toLowerCase().split('?').find(part => part.includes('.m3u8') || part.includes('.mpd')) || checkUrl.toLowerCase();
+  
+  if (lower.includes('.m3u8')) return 'hls';
+  if (lower.includes('.mpd')) return 'mpd';
   if (hintType && hintType.toLowerCase().includes('mpd')) return 'mpd';
   if (hintType && hintType.toLowerCase().includes('dash')) return 'mpd';
   return hintType || 'hls';
