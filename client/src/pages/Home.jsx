@@ -47,12 +47,36 @@ export default function Home() {
   const handleSourceSelect = async (channel, source) => {
     setSelectedChannel(channel);
     setIsFetchingSource(true);
+    
+    // Add to global tried sources if we are in a fallback loop
+    if (window.globalTriedSources) {
+      window.globalTriedSources.add(source.name);
+    }
+
     try {
       const streamInfo = await iptvService.fetchStream(channel.name, source.index);
-      setActiveSource({ name: source.name, url: streamInfo.url, type: streamInfo.type, keyId: streamInfo.keyId, key: streamInfo.key });
+      if (!streamInfo || !streamInfo.url) {
+        throw new Error("No URL returned from server");
+      }
+      setActiveSource({ 
+        name: source.name, 
+        url: streamInfo.url, 
+        type: streamInfo.type, 
+        keyId: streamInfo.keyId, 
+        key: streamInfo.key 
+      });
+      setError(null);
     } catch(err) {
-      console.error("Error fetching stream url", err);
-      alert("Failed to load stream. Please try another server.");
+      console.error(`Error fetching stream for ${source.name}:`, err);
+      
+      // Try next source automatically
+      const nextSource = channel.sources.find(s => !window.globalTriedSources?.has(s.name));
+      if (nextSource) {
+        console.log(`Fallback: Trying ${nextSource.name}...`);
+        return handleSourceSelect(channel, nextSource);
+      }
+      
+      setError("All available servers are currently unavailable. Please try another channel.");
     } finally {
       setIsFetchingSource(false);
       window.scrollTo(0, 0);

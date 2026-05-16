@@ -19,7 +19,14 @@ function detectStreamType(url, hintType) {
 }
 
 let globalLastChannelName = "";
-let globalTriedSources = new Set();
+if (!window.globalTriedSources) {
+  window.globalTriedSources = new Set();
+}
+const globalTriedSources = window.globalTriedSources;
+
+window.clearSourceCache = () => {
+  globalTriedSources.clear();
+};
 
 export default function Player({ source, channelName, onClose, availableSources, onSwitchSource }) {
   const videoRef = useRef(null);
