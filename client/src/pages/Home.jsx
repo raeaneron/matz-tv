@@ -48,10 +48,11 @@ export default function Home() {
     setSelectedChannel(channel);
     setIsFetchingSource(true);
     
-    // Add to global tried sources if we are in a fallback loop
-    if (window.globalTriedSources) {
-      window.globalTriedSources.add(source.name);
+    // Ensure global tried sources is initialized to prevent infinite recursion
+    if (!window.globalTriedSources) {
+      window.globalTriedSources = new Set();
     }
+    window.globalTriedSources.add(source.name);
 
     try {
       const streamInfo = await iptvService.fetchStream(channel.name, source.index);
