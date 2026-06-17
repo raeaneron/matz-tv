@@ -36,8 +36,23 @@ exports.handler = async (event, context) => {
 
   try {
     const tokenRes = await fetch('https://api.iyad.space/token', { headers: HEADERS });
-    const tokenData = await tokenRes.json();
-    const token = tokenData.token;
+    let tokenText = "";
+    try {
+      tokenText = await tokenRes.text();
+      const tokenData = JSON.parse(tokenText);
+      var token = tokenData.token;
+    } catch (parseErr) {
+      return {
+        statusCode: tokenRes.status,
+        headers,
+        body: JSON.stringify({
+          error: "Failed to parse token response",
+          status: tokenRes.status,
+          headers: Object.fromEntries(tokenRes.headers.entries()),
+          bodySnippet: tokenText.substring(0, 1000)
+        })
+      };
+    }
 
     const keyRes = await fetch('https://api.iyad.space/key', {
       headers: { ...HEADERS, 'Authorization': `Bearer ${token}` }
