@@ -1,192 +1,602 @@
 export const channels = [
-  // ── NEWS ──────────────────────────────────────────────────────────────────
   {
-    id: 1,
-    name: "Al Jazeera English",
-    category: "NEWS",
-    logo: "https://upload.wikimedia.org/wikipedia/en/thumb/f/f2/Al_Jazeera_English_Logo.svg/320px-Al_Jazeera_English_Logo.svg.png",
-    sources: [
-      { name: "Live HD", index: 0, url: "https://live-hls-web-aje.getaj.net/AJE/01.m3u8" }
+    "id": 1,
+    "name": "A2Z",
+    "category": "PH LOCAL",
+    "logo": "https://placehold.co/300x170/1a1a2e/e94560?text=A2Z",
+    "sources": [
+      {
+        "name": "Server 1",
+        "url": "http://136.239.173.2:6610/001/2/ch00000090990000001087/manifest.mpd?AuthInfo=v87HD9rEhwHiAdYyrP20Tg5pgSMSITY%2FHYvvCWJRp%2BqHRrK8UUahwItHhKpXgPXKytokK1MIobcue1ImXa0ZEA%3D%3D&version=v1.0&BreakPoint=0&virtualDomain=001.live_hls.zte.com&programid=ch00000000000000001176&contentid=ch00000000000000001176&videoid=ch00000090990000001087&recommendtype=0&userid=1287297673984&boid=001&stbid=02%3A00%3A00%3A00%3A00%3A00&terminalflag=1&profilecode=&usersessionid=U4DB4Z0H2EXXXX&NeedJITP=1&JITPMediaType=DASH&JITPDRMType=NO"
+      }
     ]
   },
   {
-    id: 2,
-    name: "Bloomberg TV",
-    category: "NEWS",
-    logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5d/Bloomberg_Television_logo.svg/320px-Bloomberg_Television_logo.svg.png",
-    sources: [
-      { name: "Live", index: 0, url: "https://cdn3.wowza.com/1/ejZvcEdIMVE2M1Ri/cHVs/hls/live/playlist.m3u8" }
+    "id": 2,
+    "name": "DepEd TV",
+    "category": "PH LOCAL",
+    "logo": "https://placehold.co/300x170/1a1a2e/e94560?text=DepEd+TV",
+    "sources": [
+      {
+        "name": "Server 1",
+        "url": "http://136.239.158.10:6610/001/2/ch00000090990000001340/manifest.mpd?AuthInfo=v87HD9rEhwHiAdYyrP20Tg5pgSMSITY%2FHYvvCWJRp%2BpqUIe1xo9fgdQj%2FdedKSTyytokK1MIobcue1ImXa0ZEA%3D%3D&version=v1.0&BreakPoint=0&virtualDomain=001.live_hls.zte.com&programid=ch00000000000000001832&contentid=ch00000000000000001832&videoid=ch00000090990000001340&recommendtype=0&userid=1586131651828&boid=001&stbid=02%3A00%3A00%3A00%3A00%3A00&terminalflag=1&profilecode=&usersessionid=1RR87QJ6AY2XXX&NeedJITP=1&JITPMediaType=DASH&JITPDRMType=NO"
+      }
     ]
   },
   {
-    id: 3,
-    name: "NASA TV",
-    category: "NEWS",
-    logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/NASA_logo.svg/320px-NASA_logo.svg.png",
-    sources: [
-      { name: "Public Channel", index: 0, url: "https://ntv1.akamaized.net/hls/live/2014075/NASA-NTV1-HLS/master.m3u8" }
-    ]
-  },
-  // ── ENTERTAINMENT ─────────────────────────────────────────────────────────
-  {
-    id: 4,
-    name: "Euronews",
-    category: "ENTERTAINMENT",
-    logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/aa/Euronews_logo_%28transparent%29.svg/320px-Euronews_logo_%28transparent%29.svg.png",
-    sources: [
-      { name: "English HD", index: 0, url: "https://rakuten-euronews-1-gb.samsung.wurl.tv/manifest/playlist.m3u8" }
+    "id": 3,
+    "name": "ALLTV",
+    "category": "PH LOCAL",
+    "logo": "https://placehold.co/300x170/1a1a2e/e94560?text=ALLTV",
+    "sources": [
+      {
+        "name": "Server 1",
+        "url": "http://136.239.158.10:6610/001/2/ch00000090990000001179/manifest.mpd?AuthInfo=v87HD9rEhwHiAdYyrP20Tg5pgSMSITY%2FHYvvCWJRp%2Bow35sHUcBhGBpxqddBGYEnytokK1MIobcue1ImXa0ZEA%3D%3D&version=v1.0&BreakPoint=0&virtualDomain=001.live_hls.zte.com&programid=ch00000000000000001415&contentid=ch00000000000000001415&videoid=ch00000090990000001179&recommendtype=0&userid=1205050496206&boid=001&stbid=02%3A00%3A00%3A00%3A00%3A00&terminalflag=1&profilecode=&usersessionid=02WMA0HI2O3AXX&NeedJITP=1&JITPMediaType=DASH&JITPDRMType=NO"
+      }
     ]
   },
   {
-    id: 5,
-    name: "DW English",
-    category: "ENTERTAINMENT",
-    logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/75/Deutsche_Welle_symbol_2012.svg/320px-Deutsche_Welle_symbol_2012.svg.png",
-    sources: [
-      { name: "Live Stream", index: 0, url: "https://dwamdstream102.akamaized.net/hls/live/2015525/dwstream102/stream09/streamPlaylist.m3u8" }
+    "id": 4,
+    "name": "Jeepney TV",
+    "category": "PH LOCAL",
+    "logo": "https://placehold.co/300x170/1a1a2e/e94560?text=Jeepney+TV",
+    "sources": [
+      {
+        "name": "Server 1",
+        "url": "http://161.49.17.2:6610/001/2/ch00000090990000001250/manifest.mpd?AuthInfo=v87HD9rEhwHiAdYyrP20Tg5pgSMSITY%2FHYvvCWJRp%2BpGbNnk2H5Bi8k4yR%2B9AHGFytokK1MIobcue1ImXa0ZEA%3D%3D&version=v1.0&BreakPoint=0&virtualDomain=001.live_hls.zte.com&programid=ch00000000000000001546&contentid=ch00000000000000001546&videoid=ch00000090990000001250&recommendtype=0&userid=1870820485634&boid=001&stbid=02%3A00%3A00%3A00%3A00%3A00&terminalflag=1&profilecode=&usersessionid=6T45HYQ6YE3XXX&NeedJITP=1&JITPMediaType=DASH&JITPDRMType=NO"
+      }
     ]
   },
   {
-    id: 6,
-    name: "France 24 English",
-    category: "NEWS",
-    logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/France_24_logo.svg/320px-France_24_logo.svg.png",
-    sources: [
-      { name: "Live HD", index: 0, url: "https://stream.france24.com/hls/live/2037218/F24_EN_HI_HLS/master.m3u8" }
-    ]
-  },
-  // ── MUSIC ─────────────────────────────────────────────────────────────────
-  {
-    id: 7,
-    name: "Music Box",
-    category: "MUSIC",
-    logo: "https://placehold.co/300x170/1a1a2e/e94560?text=🎵+MUSIC",
-    sources: [
-      { name: "Server 1", index: 0, url: "https://cdnlive.shooowit.net/ltlive/smil:lt.smil/playlist.m3u8" }
+    "id": 5,
+    "name": "Cartoonito",
+    "category": "PH LOCAL",
+    "logo": "https://placehold.co/300x170/1a1a2e/e94560?text=Cartoonito",
+    "sources": [
+      {
+        "name": "Server 1",
+        "url": "http://161.49.17.2:6610/001/2/ch00000090990000001125/manifest.mpd?AuthInfo=v87HD9rEhwHiAdYyrP20Tg5pgSMSITY%2FHYvvCWJRp%2BoZQDeIq8A03ROpfeWN75MYytokK1MIobcue1ImXa0ZEA%3D%3D&version=v1.0&BreakPoint=0&virtualDomain=001.live_hls.zte.com&programid=ch00000000000000001238&contentid=ch00000000000000001238&videoid=ch00000090990000001125&recommendtype=0&userid=1642489849443&boid=001&stbid=02%3A00%3A00%3A00%3A00%3A00&terminalflag=1&profilecode=&usersessionid=9X3U5ZPDLQVXXX&NeedJITP=1&JITPMediaType=DASH&JITPDRMType=NO"
+      }
     ]
   },
   {
-    id: 8,
-    name: "Mezzo Live HD",
-    category: "MUSIC",
-    logo: "https://placehold.co/300x170/0f3460/e94560?text=MEZZO",
-    sources: [
-      { name: "Live", index: 0, url: "https://mezzo-live-hd.ssl.cdn.snt.net.pl/out/v1/6e6566b3c17d4b06ba1b8b9a2a089979/index.m3u8" }
-    ]
-  },
-  // ── SPORTS ────────────────────────────────────────────────────────────────
-  {
-    id: 9,
-    name: "Eurosport 1",
-    category: "SPORTS",
-    logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Eurosport_1_logo.svg/320px-Eurosport_1_logo.svg.png",
-    sources: [
-      { name: "Stream 1", index: 0, url: "https://rakuten-eurosport-1-1-it.samsung.wurl.tv/manifest/playlist.m3u8" }
+    "id": 6,
+    "name": "FilAm TV Network",
+    "category": "PH LOCAL",
+    "logo": "https://placehold.co/300x170/1a1a2e/e94560?text=FilAm+TV+Networ",
+    "sources": [
+      {
+        "name": "Server 1",
+        "url": "https://streams.comclark.com/pknsd/filamtv/playlist.m3u8"
+      }
     ]
   },
   {
-    id: 10,
-    name: "Sport TV",
-    category: "SPORTS",
-    logo: "https://placehold.co/300x170/1b1b2f/e43f5a?text=SPORT+TV",
-    sources: [
-      { name: "Main", index: 0, url: "https://str34.creacast.com/splashtv2/high/playlist.m3u8" }
-    ]
-  },
-  // ── KIDS ──────────────────────────────────────────────────────────────────
-  {
-    id: 11,
-    name: "Cartoon Network",
-    category: "KIDS",
-    logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/80/Cartoon_Network_2010_logo.svg/320px-Cartoon_Network_2010_logo.svg.png",
-    sources: [
-      { name: "Stream", index: 0, url: "https://ott.jindujun.cn/live/dbjtoon/index.m3u8" }
+    "id": 7,
+    "name": "TV Maria",
+    "category": "PH LOCAL",
+    "logo": "https://placehold.co/300x170/1a1a2e/e94560?text=TV+Maria",
+    "sources": [
+      {
+        "name": "Server 1",
+        "url": "http://136.158.97.2:6610/001/2/ch00000090990000001160/manifest.mpd?AuthInfo=v87HD9rEhwHiAdYyrP20Tg5pgSMSITY%2FHYvvCWJRp%2BqJiJmfV%2B93mjmGGmqynSohytokK1MIobcue1ImXa0ZEA%3D%3D&version=v1.0&BreakPoint=0&virtualDomain=001.live_hls.zte.com&programid=ch00000000000000001374&contentid=ch00000000000000001374&videoid=ch00000090990000001160&recommendtype=0&userid=1605694488407&boid=001&stbid=02%3A00%3A00%3A00%3A00%3A00&terminalflag=1&profilecode=&usersessionid=G669IAJA55PXXX&NeedJITP=1&JITPMediaType=DASH&JITPDRMType=NO"
+      }
     ]
   },
   {
-    id: 12,
-    name: "Baby TV",
-    category: "KIDS",
-    logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Baby_TV_logo.svg/320px-Baby_TV_logo.svg.png",
-    sources: [
-      { name: "Live", index: 0, url: "https://rakuten-baby-tv-1-de.samsung.wurl.tv/manifest/playlist.m3u8" }
-    ]
-  },
-  // ── DOCUMENTARY ───────────────────────────────────────────────────────────
-  {
-    id: 13,
-    name: "RT Documentary",
-    category: "DOCUMENTARY",
-    logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/RT_logo.svg/320px-RT_logo.svg.png",
-    sources: [
-      { name: "Live HD", index: 0, url: "https://rt-docu.rttv.com/live/rtdoc/index.m3u8" }
+    "id": 8,
+    "name": "Tagalized Movie Channel",
+    "category": "PH LOCAL",
+    "logo": "https://placehold.co/300x170/1a1a2e/e94560?text=Tagalized+Movie",
+    "sources": [
+      {
+        "name": "Server 1",
+        "url": "http://136.239.159.20:6610/001/2/ch00000090990000001080/manifest.mpd?AuthInfo=v87HD9rEhwHiAdYyrP20Tg5pgSMSITY%2FHYvvCWJRp%2BrHx%2Fyl86rMkFVqtHp1NtQIytokK1MIobcue1ImXa0ZEA%3D%3D&version=v1.0&BreakPoint=0&virtualDomain=001.live_hls.zte.com&programid=ch00000000000000001153&contentid=ch00000000000000001153&videoid=ch00000090990000001080&recommendtype=0&userid=1123674387331&boid=001&stbid=02%3A00%3A00%3A00%3A00%3A00&terminalflag=1&profilecode=&usersessionid=OWFM2G9EILPXXX&NeedJITP=1&JITPMediaType=DASH&JITPDRMType=NO"
+      }
     ]
   },
   {
-    id: 14,
-    name: "Curiosity Stream",
-    category: "DOCUMENTARY",
-    logo: "https://placehold.co/300x170/1c1c2e/a855f7?text=CURIOSITY",
-    sources: [
-      { name: "Stream", index: 0, url: "https://csmdtv.akamaized.net/hls/live/2002830/cs_live/master.m3u8" }
-    ]
-  },
-  // ── MOVIES ────────────────────────────────────────────────────────────────
-  {
-    id: 15,
-    name: "Pluto TV Movies",
-    category: "MOVIES",
-    logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/Pluto_TV_logo.svg/320px-Pluto_TV_logo.svg.png",
-    sources: [
-      { name: "Server 1", index: 0, url: "https://service-stitcher.clusters.pluto.tv/v1/stitch/hls/channel/5f30bf3e4c9e2a0007699e70/master.m3u8?deviceId=matztv&deviceType=web&deviceMake=Chrome&deviceModel=web&appName=web&appVersion=na&deviceDNT=0&advertisingId=&userId=&sessionID=matztv&serverSideAds=false&embedPartner=&signature=&jwt=" }
+    "id": 9,
+    "name": "Moonbug Kids",
+    "category": "PH LOCAL",
+    "logo": "https://placehold.co/300x170/1a1a2e/e94560?text=Moonbug+Kids",
+    "sources": [
+      {
+        "name": "Server 1",
+        "url": "https://moonbug-rokuus.amagi.tv/playlist.m3u8"
+      }
     ]
   },
   {
-    id: 16,
-    name: "Action Movies 24/7",
-    category: "MOVIES",
-    logo: "https://placehold.co/300x170/1a0a0a/ff4444?text=🎬+ACTION",
-    sources: [
-      { name: "Live", index: 0, url: "https://rakuten-action-movies-1-it.samsung.wurl.tv/manifest/playlist.m3u8" }
-    ]
-  },
-  // ── LIFESTYLE ─────────────────────────────────────────────────────────────
-  {
-    id: 17,
-    name: "Food Network",
-    category: "LIFESTYLE",
-    logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/58/Food_Network_new_logo.svg/320px-Food_Network_new_logo.svg.png",
-    sources: [
-      { name: "Stream", index: 0, url: "https://rakuten-food-network-1-us.samsung.wurl.tv/manifest/playlist.m3u8" }
+    "id": 10,
+    "name": "GMA",
+    "category": "PH LOCAL",
+    "logo": "https://placehold.co/300x170/1a1a2e/e94560?text=GMA",
+    "sources": [
+      {
+        "name": "Server 1",
+        "url": "http://136.158.97.2:6610/001/2/ch00000090990000001093/manifest.mpd?AuthInfo=v87HD9rEhwHiAdYyrP20Tg5pgSMSITY%2FHYvvCWJRp%2BoLvT86fM74ocVChyFS93HUytokK1MIobcue1ImXa0ZEA%3D%3D&version=v1.0&BreakPoint=0&virtualDomain=001.live_hls.zte.com&programid=ch00000000000000001214&contentid=ch00000000000000001214&videoid=ch00000090990000001093&recommendtype=0&userid=1084724632836&boid=001&stbid=02%3A00%3A00%3A00%3A00%3A00&terminalflag=1&profilecode=&usersessionid=FGE3OISG4KGXXX&NeedJITP=1&JITPMediaType=DASH&JITPDRMType=NO"
+      }
     ]
   },
   {
-    id: 18,
-    name: "Travel Channel",
-    category: "LIFESTYLE",
-    logo: "https://placehold.co/300x170/0d2137/00b4d8?text=✈️+TRAVEL",
-    sources: [
-      { name: "Live", index: 0, url: "https://rakuten-travel-channel-1-us.samsung.wurl.tv/manifest/playlist.m3u8" }
-    ]
-  },
-  // ── TECH ──────────────────────────────────────────────────────────────────
-  {
-    id: 19,
-    name: "Lofi Radio",
-    category: "MUSIC",
-    logo: "https://placehold.co/300x170/1a1a2e/9d4edd?text=🎧+LOFI",
-    sources: [
-      { name: "24/7 Stream", index: 0, url: "https://strn.isolution.studio/radio/8000/stream?1733065481" }
+    "id": 11,
+    "name": "INCTV (720p)",
+    "category": "PH LOCAL",
+    "logo": "https://placehold.co/300x170/1a1a2e/e94560?text=INCTV+(720p)",
+    "sources": [
+      {
+        "name": "Server 1",
+        "url": "http://136.239.159.18:6610/001/2/ch00000090990000001092/manifest.mpd?AuthInfo=v87HD9rEhwHiAdYyrP20Tg5pgSMSITY%2FHYvvCWJRp%2BrC5ZD%2FYbS0KSGrFVJUNIMkytokK1MIobcue1ImXa0ZEA%3D%3D&version=v1.0&BreakPoint=0&virtualDomain=001.live_hls.zte.com&programid=ch00000000000000001178&contentid=ch00000000000000001178&videoid=ch00000090990000001092&recommendtype=0&userid=1760058453659&boid=001&stbid=02%3A00%3A00%3A00%3A00%3A00&terminalflag=1&profilecode=&usersessionid=HILNO5G9U9IXXX&NeedJITP=1&JITPMediaType=DASH&JITPDRMType=NO"
+      }
     ]
   },
   {
-    id: 20,
-    name: "Test Stream (HLS)",
-    category: "ENTERTAINMENT",
-    logo: "https://placehold.co/300x170/111111/ffffff?text=▶+TEST",
-    sources: [
-      { name: "Mux Test HD", index: 0, url: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8" },
-      { name: "Mux Test SD", index: 1, url: "https://test-streams.mux.dev/test_001/stream.m3u8" }
+    "id": 12,
+    "name": "Vegas Life TV",
+    "category": "PH LOCAL",
+    "logo": "https://placehold.co/300x170/1a1a2e/e94560?text=Vegas+Life+TV",
+    "sources": [
+      {
+        "name": "Server 1",
+        "url": "https://streams.comclark.com/pknsd/vegaslifetv/playlist.m3u8"
+      }
+    ]
+  },
+  {
+    "id": 13,
+    "name": "Mindanow Network TV",
+    "category": "PH LOCAL",
+    "logo": "https://placehold.co/300x170/1a1a2e/e94560?text=Mindanow+Networ",
+    "sources": [
+      {
+        "name": "Server 1",
+        "url": "https://streams.comclark.com/overlay/mindanow/playlist.m3u8"
+      }
+    ]
+  },
+  {
+    "id": 14,
+    "name": "BBC News Asia Pacific (720p)",
+    "category": "PH LOCAL",
+    "logo": "https://placehold.co/300x170/1a1a2e/e94560?text=BBC+News+Asia+P",
+    "sources": [
+      {
+        "name": "Server 1",
+        "url": "https://cdn4.skygo.mn/live/disk1/BBC_News/HLSv3-FTA/BBC_News.m3u8"
+      }
+    ]
+  },
+  {
+    "id": 15,
+    "name": "CLTV 36 (720p)",
+    "category": "PH LOCAL",
+    "logo": "https://placehold.co/300x170/1a1a2e/e94560?text=CLTV+36+(720p)",
+    "sources": [
+      {
+        "name": "Server 1",
+        "url": "https://live.cltv36.tv:5443/LiveApp/streams/cltvlive.m3u8"
+      }
+    ]
+  },
+  {
+    "id": 16,
+    "name": "Bilyonario News Channel (720p)",
+    "category": "PH LOCAL",
+    "logo": "https://placehold.co/300x170/1a1a2e/e94560?text=Bilyonario+News",
+    "sources": [
+      {
+        "name": "Server 1",
+        "url": "https://amg19223-amg19223c11-amgplt0352.playout.now3.amagi.tv/playlist/amg19223-amg19223c11-amgplt0352/playlist.m3u8"
+      }
+    ]
+  },
+  {
+    "id": 17,
+    "name": "EWTN Asia-Pacific (720p)",
+    "category": "PH LOCAL",
+    "logo": "https://placehold.co/300x170/1a1a2e/e94560?text=EWTN+Asia-Pacif",
+    "sources": [
+      {
+        "name": "Server 1",
+        "url": "https://cdn3.wowza.com/1/QmVNUVhTNTZSS3Uz/YWQ0aHpi/hls/live/playlist.m3u8"
+      }
+    ]
+  },
+  {
+    "id": 18,
+    "name": "Arirang",
+    "category": "PH LOCAL",
+    "logo": "https://placehold.co/300x170/1a1a2e/e94560?text=Arirang",
+    "sources": [
+      {
+        "name": "Server 1",
+        "url": "https://amdlive-ch03-ctnd-com.akamaized.net/arirang_1ch/smil:arirang_1ch.smil/playlist.m3u8"
+      }
+    ]
+  },
+  {
+    "id": 19,
+    "name": "Bloomberg Asia",
+    "category": "PH LOCAL",
+    "logo": "https://placehold.co/300x170/1a1a2e/e94560?text=Bloomberg+Asia",
+    "sources": [
+      {
+        "name": "Server 1",
+        "url": "https://www.bloomberg.com/media-manifest/streams/asia.m3u8"
+      }
+    ]
+  },
+  {
+    "id": 20,
+    "name": "BBC World News",
+    "category": "PH LOCAL",
+    "logo": "https://placehold.co/300x170/1a1a2e/e94560?text=BBC+World+News",
+    "sources": [
+      {
+        "name": "Server 1",
+        "url": "https://vs-hls-push-ww-live.akamaized.net/x=4/i=urn:bbc:pips:service:bbc_news_channel_hd/t=3840/v=pv14/b=5070016/main.m3u8"
+      }
+    ]
+  },
+  {
+    "id": 21,
+    "name": "CGTN News Live",
+    "category": "PH LOCAL",
+    "logo": "https://placehold.co/300x170/1a1a2e/e94560?text=CGTN+News+Live",
+    "sources": [
+      {
+        "name": "Server 1",
+        "url": "http://136.239.173.26:6610/001/2/ch00000090990000001146/manifest.mpd?AuthInfo=v87HD9rEhwHiAdYyrP20Tg5pgSMSITY%2FHYvvCWJRp%2Bq0bLdlQQxjquEy7BUYBE%2BOytokK1MIobcue1ImXa0ZEA%3D%3D&version=v1.0&BreakPoint=0&virtualDomain=001.live_hls.zte.com&programid=ch00000000000000001316&contentid=ch00000000000000001316&videoid=ch00000090990000001146&recommendtype=0&userid=1917967408923&boid=001&stbid=02%3A00%3A00%3A00%3A00%3A00&terminalflag=1&profilecode=&usersessionid=4ADPFTEPDLCXXX&NeedJITP=1&JITPMediaType=DASH&JITPDRMType=NO%20"
+      }
+    ]
+  },
+  {
+    "id": 22,
+    "name": "CGTN Documentaries",
+    "category": "PH LOCAL",
+    "logo": "https://placehold.co/300x170/1a1a2e/e94560?text=CGTN+Documentar",
+    "sources": [
+      {
+        "name": "Server 1",
+        "url": "https://english-livebkali.cgtn.com/live/doccgtn_1.m3u8"
+      }
+    ]
+  },
+  {
+    "id": 23,
+    "name": "Outdoor Channel",
+    "category": "PH LOCAL",
+    "logo": "https://placehold.co/300x170/1a1a2e/e94560?text=Outdoor+Channel",
+    "sources": [
+      {
+        "name": "Server 1",
+        "url": "https://cdn-apse1-prod.tsv2.amagi.tv/linear/amg00718-outdoorchannela-outdoortvnz-samsungnz/playlist.m3u8"
+      }
+    ]
+  },
+  {
+    "id": 24,
+    "name": "Thrillers",
+    "category": "PH LOCAL",
+    "logo": "https://placehold.co/300x170/1a1a2e/e94560?text=Thrillers",
+    "sources": [
+      {
+        "name": "Server 1",
+        "url": "https://amc-rushbyamc-1-us.vizio.wurl.tv/playlist.m3u8"
+      }
+    ]
+  },
+  {
+    "id": 25,
+    "name": "Bein Sports Xtra",
+    "category": "PH LOCAL",
+    "logo": "https://placehold.co/300x170/1a1a2e/e94560?text=Bein+Sports+Xtr",
+    "sources": [
+      {
+        "name": "Server 1",
+        "url": "https://amg01334-beinsportsllc-beinxtra-localnow-kcy6r.amagi.tv/playlist.m3u8"
+      }
+    ]
+  },
+  {
+    "id": 26,
+    "name": "MovieSphere",
+    "category": "PH LOCAL",
+    "logo": "https://placehold.co/300x170/1a1a2e/e94560?text=MovieSphere",
+    "sources": [
+      {
+        "name": "Server 1",
+        "url": "https://moviesphereuk-samsunguk.amagi.tv/playlist.m3u8"
+      }
+    ]
+  },
+  {
+    "id": 27,
+    "name": "TFC GUAM",
+    "category": "PH LOCAL",
+    "logo": "https://placehold.co/300x170/1a1a2e/e94560?text=TFC+GUAM",
+    "sources": [
+      {
+        "name": "Server 1",
+        "url": "https://tfcguam-abscbn-ono.amagi.tv/index.m3u8"
+      }
+    ]
+  },
+  {
+    "id": 28,
+    "name": "3ABN Kids",
+    "category": "PH LOCAL",
+    "logo": "https://placehold.co/300x170/1a1a2e/e94560?text=3ABN+Kids",
+    "sources": [
+      {
+        "name": "Server 1",
+        "url": "https://3abn.bozztv.com/3abn2/Kids_live/smil:Kids_live.smil/playlist.m3u8"
+      }
+    ]
+  },
+  {
+    "id": 29,
+    "name": "Blues TV",
+    "category": "PH LOCAL",
+    "logo": "https://placehold.co/300x170/1a1a2e/e94560?text=Blues+TV",
+    "sources": [
+      {
+        "name": "Server 1",
+        "url": "https://2-fss-2.streamhoster.com/pl_138/205510-3094608-1/playlist.m3u8"
+      }
+    ]
+  },
+  {
+    "id": 30,
+    "name": "Japanim TV (1080p)",
+    "category": "PH LOCAL",
+    "logo": "https://placehold.co/300x170/1a1a2e/e94560?text=Japanim+TV+(108",
+    "sources": [
+      {
+        "name": "Server 1",
+        "url": "https://foxkidstv.be:3369/stream/play.m3u8"
+      }
+    ]
+  },
+  {
+    "id": 31,
+    "name": "Magic Kids (486p)",
+    "category": "PH LOCAL",
+    "logo": "https://placehold.co/300x170/1a1a2e/e94560?text=Magic+Kids+(486",
+    "sources": [
+      {
+        "name": "Server 1",
+        "url": "https://magicstream.ddns.net/magicstream/stream.m3u8"
+      }
+    ]
+  },
+  {
+    "id": 32,
+    "name": "Persiana Junior",
+    "category": "PH LOCAL",
+    "logo": "https://placehold.co/300x170/1a1a2e/e94560?text=Persiana+Junior",
+    "sources": [
+      {
+        "name": "Server 1",
+        "url": "https://junhls.persiana.live/hls/stream.m3u8"
+      }
+    ]
+  },
+  {
+    "id": 33,
+    "name": "Yahoo! Finance (1080p)",
+    "category": "PH LOCAL",
+    "logo": "https://placehold.co/300x170/1a1a2e/e94560?text=Yahoo!+Finance+",
+    "sources": [
+      {
+        "name": "Server 1",
+        "url": "https://yahoo-samsung.amagi.tv/playlist.m3u8"
+      }
+    ]
+  },
+  {
+    "id": 34,
+    "name": "EWTN Europe (720p)",
+    "category": "PH LOCAL",
+    "logo": "https://placehold.co/300x170/1a1a2e/e94560?text=EWTN+Europe+(72",
+    "sources": [
+      {
+        "name": "Server 1",
+        "url": "https://cdn3.wowza.com/1/T2NXeHF6UGlGbHY3/WFluRldQ/hls/live/playlist.m3u8"
+      }
+    ]
+  },
+  {
+    "id": 35,
+    "name": "CNN",
+    "category": "PH LOCAL",
+    "logo": "https://placehold.co/300x170/1a1a2e/e94560?text=CNN",
+    "sources": [
+      {
+        "name": "Server 1",
+        "url": "https://turnerlive.warnermediacdn.com/hls/live/586495/cnngo/cnn_slate/VIDEO_0_3564000.m3u8"
+      }
+    ]
+  },
+  {
+    "id": 36,
+    "name": "Abante TV (1080p)",
+    "category": "PH CHANNELS",
+    "logo": "https://placehold.co/300x170/1a1a2e/e94560?text=Abante+TV+(1080",
+    "sources": [
+      {
+        "name": "Server 1",
+        "url": "https://amg19223-amg19223c12-amgplt0352.playout.now3.amagi.tv/playlist/amg19223-amg19223c12-amgplt0352/playlist.m3u8"
+      }
+    ]
+  },
+  {
+    "id": 37,
+    "name": "Ani-Blast (720p)",
+    "category": "PH CHANNELS",
+    "logo": "https://placehold.co/300x170/1a1a2e/e94560?text=Ani-Blast+(720p",
+    "sources": [
+      {
+        "name": "Server 1",
+        "url": "https://amg19223-amg19223c9-amgplt0019.playout.now3.amagi.tv/playlist/amg19223-amg19223c9-amgplt0019/playlist.m3u8"
+      }
+    ]
+  },
+  {
+    "id": 38,
+    "name": "Bilyonaryo News Channel (1080p)",
+    "category": "PH CHANNELS",
+    "logo": "https://placehold.co/300x170/1a1a2e/e94560?text=Bilyonaryo+News",
+    "sources": [
+      {
+        "name": "Server 1",
+        "url": "https://amg19223-amg19223c11-amgplt0352.playout.now3.amagi.tv/playlist/amg19223-amg19223c11-amgplt0352/playlist.m3u8"
+      }
+    ]
+  },
+  {
+    "id": 39,
+    "name": "CCTN 47 (1080p)",
+    "category": "PH CHANNELS",
+    "logo": "https://placehold.co/300x170/1a1a2e/e94560?text=CCTN+47+(1080p)",
+    "sources": [
+      {
+        "name": "Server 1",
+        "url": "http://122.55.252.134:8443/live/bba5b536faeacb9b56a3239f1ee8e3b3/1.m3u8"
+      }
+    ]
+  },
+  {
+    "id": 40,
+    "name": "CLTV 36 (720p)",
+    "category": "PH CHANNELS",
+    "logo": "https://placehold.co/300x170/1a1a2e/e94560?text=CLTV+36+(720p)",
+    "sources": [
+      {
+        "name": "Server 1",
+        "url": "https://live.cltv36.tv:5443/LiveApp/streams/cltvlive.m3u8"
+      }
+    ]
+  },
+  {
+    "id": 41,
+    "name": "Kongress TV (1080p)",
+    "category": "PH CHANNELS",
+    "logo": "https://placehold.co/300x170/1a1a2e/e94560?text=Kongress+TV+(10",
+    "sources": [
+      {
+        "name": "Server 1",
+        "url": "https://stitch.teletarget.ru/api/v1/hls/504/158/index.m3u8"
+      }
+    ]
+  },
+  {
+    "id": 42,
+    "name": "Hope Channel Philippines (1080p)",
+    "category": "PH CHANNELS",
+    "logo": "https://placehold.co/300x170/1a1a2e/e94560?text=Hope+Channel+Ph",
+    "sources": [
+      {
+        "name": "Server 1",
+        "url": "https://jstre.am/live/jsl:7A1swL7Fhlh.m3u8"
+      }
+    ]
+  },
+  {
+    "id": 43,
+    "name": "Premier Sports (1080p)",
+    "category": "PH CHANNELS",
+    "logo": "https://placehold.co/300x170/1a1a2e/e94560?text=Premier+Sports+",
+    "sources": [
+      {
+        "name": "Server 1",
+        "url": "https://amg19223-amg19223c3-amgplt0351.playout.now3.amagi.tv/playlist/amg19223-amg19223c3-amgplt0351/playlist.m3u8"
+      }
+    ]
+  },
+  {
+    "id": 44,
+    "name": "Premier Sports 2 (1080p)",
+    "category": "PH CHANNELS",
+    "logo": "https://placehold.co/300x170/1a1a2e/e94560?text=Premier+Sports+",
+    "sources": [
+      {
+        "name": "Server 1",
+        "url": "https://amg19223-amg19223c4-amgplt0351.playout.now3.amagi.tv/playlist/amg19223-amg19223c4-amgplt0351/playlist.m3u8"
+      }
+    ]
+  },
+  {
+    "id": 45,
+    "name": "TeleRadyo (1080p)",
+    "category": "PH CHANNELS",
+    "logo": "https://placehold.co/300x170/1a1a2e/e94560?text=TeleRadyo+(1080",
+    "sources": [
+      {
+        "name": "Server 1",
+        "url": "https://cdn-ue1-prod.tsv2.amagi.tv/linear/amg01006-abs-cbn-teleradyo-dash-abscbnono/index.mpd"
+      }
+    ]
+  },
+  {
+    "id": 46,
+    "name": "Cartoon Channel PH (720p)",
+    "category": "PH CHANNELS",
+    "logo": "https://placehold.co/300x170/1a1a2e/e94560?text=Cartoon+Channel",
+    "sources": [
+      {
+        "name": "Server 1",
+        "url": "https://stream-cdn-iad3.vaughnsoft.net/play/live_cartoonchannelph.flv"
+      }
+    ]
+  },
+  {
+    "id": 47,
+    "name": "Kapatid TV 5 (480p)",
+    "category": "PH CHANNELS",
+    "logo": "https://placehold.co/300x170/1a1a2e/e94560?text=Kapatid+TV+5+(4",
+    "sources": [
+      {
+        "name": "Server 1",
+        "url": "https://thinkkast.dpdns.org/tkk-ph/i7/kapatid_hd/kapatid.m3u8"
+      }
+    ]
+  },
+  {
+    "id": 48,
+    "name": "Knowledge Channel (360p)",
+    "category": "PH CHANNELS",
+    "logo": "https://placehold.co/300x170/1a1a2e/e94560?text=Knowledge+Chann",
+    "sources": [
+      {
+        "name": "Server 1",
+        "url": "https://thinkkast.dpdns.org/tkk-ph/i7/knowledge_channel/knowledge-channel.m3u8"
+      }
+    ]
+  },
+  {
+    "id": 991,
+    "name": "Al Jazeera English",
+    "category": "INTERNATIONAL",
+    "logo": "https://upload.wikimedia.org/wikipedia/en/thumb/f/f2/Al_Jazeera_English_Logo.svg/320px-Al_Jazeera_English_Logo.svg.png",
+    "sources": [
+      {
+        "name": "Live HD",
+        "url": "https://live-hls-web-aje.getaj.net/AJE/01.m3u8"
+      }
+    ]
+  },
+  {
+    "id": 992,
+    "name": "NASA TV",
+    "category": "INTERNATIONAL",
+    "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/NASA_logo.svg/320px-NASA_logo.svg.png",
+    "sources": [
+      {
+        "name": "Live",
+        "url": "https://ntv1.akamaized.net/hls/live/2014075/NASA-NTV1-HLS/master.m3u8"
+      }
     ]
   }
-]
+];
