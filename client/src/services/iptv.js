@@ -23,7 +23,16 @@ export const iptvService = {
     if (localChannel) {
       const source = localChannel.sources[serverIndex] || localChannel.sources[0];
       if (source && source.url) {
-        return { url: source.url, type: 'hls' };
+        let finalUrl = source.url;
+        
+        // Proxy http:// streams to avoid mixed-content errors on Netlify (https)
+        // Also proxy streams that might have CORS issues
+        if (finalUrl.startsWith('http://') || finalUrl.includes('.mpd')) {
+           const ext = finalUrl.includes('.m3u8') ? '/stream.m3u8' : (finalUrl.includes('.mpd') ? '/stream.mpd' : '');
+           finalUrl = `${PROXY_PATH}${ext}?url=${encodeURIComponent(finalUrl)}`;
+        }
+        
+        return { url: finalUrl, type: finalUrl.includes('.mpd') ? 'mpd' : 'hls' };
       }
     }
 
