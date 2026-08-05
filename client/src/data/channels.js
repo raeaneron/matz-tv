@@ -247,7 +247,7 @@ export const channels = [
     "sources": [
       {
         "name": "Server 1",
-        "url": "http://136.239.173.26:6610/001/2/ch00000090990000001146/manifest.mpd?AuthInfo=v87HD9rEhwHiAdYyrP20Tg5pgSMSITY%2FHYvvCWJRp%2Bq0bLdlQQxjquEy7BUYBE%2BOytokK1MIobcue1ImXa0ZEA%3D%3D&version=v1.0&BreakPoint=0&virtualDomain=001.live_hls.zte.com&programid=ch00000000000000001316&contentid=ch00000000000000001316&videoid=ch00000090990000001146&recommendtype=0&userid=1917967408923&boid=001&stbid=02%3A00%3A00%3A00%3A00%3A00&terminalflag=1&profilecode=&usersessionid=4ADPFTEPDLCXXX&NeedJITP=1&JITPMediaType=DASH&JITPDRMType=NO%20"
+        "url": "http://136.239.173.26:6610/001/2/ch00000090990000001146/manifest.mpd?AuthInfo=v87HD9rEhwHiAdYyrP20Tg5pgSMSITY%2FHYvvCWJRp%2Bq0bLdlQQxjquEy7BUYBE%2BOytokK1MIobcue1ImXa0ZEA%3D%3D&version=v1.0&BreakPoint=0&virtualDomain=001.live_hls.zte.com&programid=ch00000000000000001316&contentid=ch00000000000000001316&videoid=ch00000090990000001146&recommendtype=0&userid=1917967408923&boid=001&stbid=02%3A00%3A00%3A00%3A00%3A00&terminalflag=1&profilecode=&usersessionid=4ADPFTEPDLCXXX&NeedJITP=1&JITPMediaType=DASH&JITPDRMType=NO"
       }
     ]
   },
@@ -421,157 +421,37 @@ export const channels = [
   },
   {
     "id": 36,
-    "name": "Abante TV (1080p)",
-    "category": "PH CHANNELS",
-    "logo": "https://placehold.co/300x170/1a1a2e/e94560?text=Abante+TV+(1080",
+    "name": "Kapamilya Online Live",
+    "category": "PH LOCAL",
+    "logo": "https://placehold.co/300x170/1a1a2e/e94560?text=Kapamilya+Onlin",
     "sources": [
       {
         "name": "Server 1",
-        "url": "https://amg19223-amg19223c12-amgplt0352.playout.now3.amagi.tv/playlist/amg19223-amg19223c12-amgplt0352/playlist.m3u8"
+        "url": "https://manifest.googlevideo.com/api/manifest/hls_variant/expire/1707731616/ei/QJbJZZiXIZ2D5t0P9PiQwAs/ip/175.176.7.129/id/XHDrMh-Ee6E.1/source/yt_live_broadcast/requiressl/yes/xpc/EgVo2aDSNQ==/hfr/1/ctier/SPL/playlist_duration/30/manifest_duration/30/maudio/1/gcr/ph/spc/UWF9f1DbtFosIjbTMvHJwmGcCHEzJoLi1hMiETEb40m61Ag/vprv/1/go/1/pacing/0/nvgoi/1/keepalive/yes/fexp/24007246/dover/11/itag/0/playlist_type/DVR/sparams/expire,ei,ip,id,source,requiressl,xpc,hfr,ctier,playlist_duration,manifest_duration,maudio,gcr,spc,vprv,go,itag,playlist_type/sig/AJfQdSswRAIgOqNkFSx-6Ep_J5hh0La9VRHl6lSEycauErSbih6UOXoCIDO5q0yz2ioWqajCwDT3xZXqUSAJmqG_BihHzBaiqpC9/file/index.m3u8"
       }
     ]
   },
   {
     "id": 37,
-    "name": "Ani-Blast (720p)",
-    "category": "PH CHANNELS",
-    "logo": "https://placehold.co/300x170/1a1a2e/e94560?text=Ani-Blast+(720p",
+    "name": "Animax",
+    "category": "PH LOCAL",
+    "logo": "https://placehold.co/300x170/1a1a2e/e94560?text=Animax",
     "sources": [
       {
         "name": "Server 1",
-        "url": "https://amg19223-amg19223c9-amgplt0019.playout.now3.amagi.tv/playlist/amg19223-amg19223c9-amgplt0019/playlist.m3u8"
+        "url": "http://202.57.43.60:8443/live/5748aabe4c9d661afbd7f4068248f664/125.m3u8"
       }
     ]
   },
   {
     "id": 38,
-    "name": "Bilyonaryo News Channel (1080p)",
-    "category": "PH CHANNELS",
-    "logo": "https://placehold.co/300x170/1a1a2e/e94560?text=Bilyonaryo+News",
+    "name": "Kapamilya Channel",
+    "category": "PH LOCAL",
+    "logo": "https://placehold.co/300x170/1a1a2e/e94560?text=Kapamilya+Chann",
     "sources": [
       {
         "name": "Server 1",
-        "url": "https://amg19223-amg19223c11-amgplt0352.playout.now3.amagi.tv/playlist/amg19223-amg19223c11-amgplt0352/playlist.m3u8"
-      }
-    ]
-  },
-  {
-    "id": 39,
-    "name": "CCTN 47 (1080p)",
-    "category": "PH CHANNELS",
-    "logo": "https://placehold.co/300x170/1a1a2e/e94560?text=CCTN+47+(1080p)",
-    "sources": [
-      {
-        "name": "Server 1",
-        "url": "http://122.55.252.134:8443/live/bba5b536faeacb9b56a3239f1ee8e3b3/1.m3u8"
-      }
-    ]
-  },
-  {
-    "id": 40,
-    "name": "CLTV 36 (720p)",
-    "category": "PH CHANNELS",
-    "logo": "https://placehold.co/300x170/1a1a2e/e94560?text=CLTV+36+(720p)",
-    "sources": [
-      {
-        "name": "Server 1",
-        "url": "https://live.cltv36.tv:5443/LiveApp/streams/cltvlive.m3u8"
-      }
-    ]
-  },
-  {
-    "id": 41,
-    "name": "Kongress TV (1080p)",
-    "category": "PH CHANNELS",
-    "logo": "https://placehold.co/300x170/1a1a2e/e94560?text=Kongress+TV+(10",
-    "sources": [
-      {
-        "name": "Server 1",
-        "url": "https://stitch.teletarget.ru/api/v1/hls/504/158/index.m3u8"
-      }
-    ]
-  },
-  {
-    "id": 42,
-    "name": "Hope Channel Philippines (1080p)",
-    "category": "PH CHANNELS",
-    "logo": "https://placehold.co/300x170/1a1a2e/e94560?text=Hope+Channel+Ph",
-    "sources": [
-      {
-        "name": "Server 1",
-        "url": "https://jstre.am/live/jsl:7A1swL7Fhlh.m3u8"
-      }
-    ]
-  },
-  {
-    "id": 43,
-    "name": "Premier Sports (1080p)",
-    "category": "PH CHANNELS",
-    "logo": "https://placehold.co/300x170/1a1a2e/e94560?text=Premier+Sports+",
-    "sources": [
-      {
-        "name": "Server 1",
-        "url": "https://amg19223-amg19223c3-amgplt0351.playout.now3.amagi.tv/playlist/amg19223-amg19223c3-amgplt0351/playlist.m3u8"
-      }
-    ]
-  },
-  {
-    "id": 44,
-    "name": "Premier Sports 2 (1080p)",
-    "category": "PH CHANNELS",
-    "logo": "https://placehold.co/300x170/1a1a2e/e94560?text=Premier+Sports+",
-    "sources": [
-      {
-        "name": "Server 1",
-        "url": "https://amg19223-amg19223c4-amgplt0351.playout.now3.amagi.tv/playlist/amg19223-amg19223c4-amgplt0351/playlist.m3u8"
-      }
-    ]
-  },
-  {
-    "id": 45,
-    "name": "TeleRadyo (1080p)",
-    "category": "PH CHANNELS",
-    "logo": "https://placehold.co/300x170/1a1a2e/e94560?text=TeleRadyo+(1080",
-    "sources": [
-      {
-        "name": "Server 1",
-        "url": "https://cdn-ue1-prod.tsv2.amagi.tv/linear/amg01006-abs-cbn-teleradyo-dash-abscbnono/index.mpd"
-      }
-    ]
-  },
-  {
-    "id": 46,
-    "name": "Cartoon Channel PH (720p)",
-    "category": "PH CHANNELS",
-    "logo": "https://placehold.co/300x170/1a1a2e/e94560?text=Cartoon+Channel",
-    "sources": [
-      {
-        "name": "Server 1",
-        "url": "https://stream-cdn-iad3.vaughnsoft.net/play/live_cartoonchannelph.flv"
-      }
-    ]
-  },
-  {
-    "id": 47,
-    "name": "Kapatid TV 5 (480p)",
-    "category": "PH CHANNELS",
-    "logo": "https://placehold.co/300x170/1a1a2e/e94560?text=Kapatid+TV+5+(4",
-    "sources": [
-      {
-        "name": "Server 1",
-        "url": "https://thinkkast.dpdns.org/tkk-ph/i7/kapatid_hd/kapatid.m3u8"
-      }
-    ]
-  },
-  {
-    "id": 48,
-    "name": "Knowledge Channel (360p)",
-    "category": "PH CHANNELS",
-    "logo": "https://placehold.co/300x170/1a1a2e/e94560?text=Knowledge+Chann",
-    "sources": [
-      {
-        "name": "Server 1",
-        "url": "https://thinkkast.dpdns.org/tkk-ph/i7/knowledge_channel/knowledge-channel.m3u8"
+        "url": "http://202.57.43.60:8443/live/5748aabe4c9d661afbd7f4068248f664/100.m3u8"
       }
     ]
   },
