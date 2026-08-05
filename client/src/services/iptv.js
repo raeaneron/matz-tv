@@ -1,3 +1,5 @@
+import { channels as localChannels } from '../data/channels';
+
 const API_BASE = '/api';
 const PROXY_PATH = '/api/proxy';
 
@@ -7,14 +9,25 @@ export const iptvService = {
       const response = await fetch(`${API_BASE}/channels`);
       if (!response.ok) throw new Error("Failed to fetch channels from proxy server");
       const channels = await response.json();
+      if (!channels || channels.length === 0) throw new Error("Empty channel list");
       return channels;
     } catch (err) {
-      console.error("Fetch channels error:", err);
-      throw err;
+      console.warn("Remote API unavailable, using local channel list:", err.message);
+      return localChannels;
     }
   },
 
   async fetchStream(channelName, serverIndex) {
+    // First check if the local channel has a direct URL — use it immediately
+    const localChannel = localChannels.find(c => c.name === channelName);
+    if (localChannel) {
+      const source = localChannel.sources[serverIndex] || localChannel.sources[0];
+      if (source && source.url) {
+        return { url: source.url, type: 'hls' };
+      }
+    }
+
+    // Otherwise fall back to the remote API
     try {
       const playRes = await fetch(`${API_BASE}/stream`, {
         method: 'POST',
