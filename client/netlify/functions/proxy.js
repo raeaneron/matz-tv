@@ -41,7 +41,7 @@ exports.handler = async (event, context) => {
           if (line.trim() && !line.startsWith('#')) {
             const absoluteUrl = line.startsWith('http') ? line : baseUrl + line;
             if (absoluteUrl.includes('.ts')) {
-              return absoluteUrl;
+              return `${protocol}://${host}/.netlify/functions/proxy?url=${encodeURIComponent(absoluteUrl)}`;
             }
             const ext = absoluteUrl.includes('.m3u8') ? '/stream.m3u8' : '';
             return `${protocol}://${host}/.netlify/functions/proxy${ext}?url=${encodeURIComponent(absoluteUrl)}`;
@@ -49,7 +49,9 @@ exports.handler = async (event, context) => {
           if (line.includes('URI="')) {
             return line.replace(/URI="([^"]+)"/, (match, p1) => {
                const absoluteUrl = p1.startsWith('http') ? p1 : baseUrl + p1;
-               if (absoluteUrl.includes('.ts')) return `URI="${absoluteUrl}"`;
+               if (absoluteUrl.includes('.ts')) {
+                 return `URI="${protocol}://${host}/.netlify/functions/proxy?url=${encodeURIComponent(absoluteUrl)}"`;
+               }
                const ext = absoluteUrl.includes('.m3u8') ? '/stream.m3u8' : '';
                return `URI="${protocol}://${host}/.netlify/functions/proxy${ext}?url=${encodeURIComponent(absoluteUrl)}"`;
             });
