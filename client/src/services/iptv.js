@@ -1,7 +1,7 @@
 import { channels as localChannels } from '../data/channels';
 
 const API_BASE = '/api';
-const PROXY_PATH = '/api/proxy';
+const PROXY_PATH = '/.netlify/functions/proxy';
 
 export const iptvService = {
   async fetchChannels() {
