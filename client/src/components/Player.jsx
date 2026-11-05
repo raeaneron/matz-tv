@@ -101,15 +101,22 @@ export default function Player({ source, channelName, onClose, availableSources,
         const shakaPlayer = new window.shaka.Player(video);
         playerInstanceRef.current = shakaPlayer;
 
+        // ── KEY FIX: Proxy ALL http:// segment/manifest requests through our
+        //   Netlify function so they are not blocked as mixed-content on HTTPS.
+        shakaPlayer.getNetworkingEngine().registerRequestFilter((_type, request) => {
+          const uri = request.uris[0];
+          if (uri && uri.startsWith('http://')) {
+            const ext = uri.includes('.mpd')  ? '/stream.mpd'
+                      : uri.includes('.m3u8') ? '/stream.m3u8'
+                      : '';
+            request.uris[0] = `/api/proxy${ext}?url=${encodeURIComponent(uri)}`;
+          }
+        });
+
         // Configure Shaka for DRM if needed
         if (hasDrm) {
-          // Shaka correctly handles hex-encoded keys natively
-          const clearKeys = {
-            [source.keyId]: source.key
-          };
-          shakaPlayer.configure({
-            drm: { clearKeys }
-          });
+          const clearKeys = { [source.keyId]: source.key };
+          shakaPlayer.configure({ drm: { clearKeys } });
         }
 
         shakaPlayer.addEventListener('error', (event) => {
