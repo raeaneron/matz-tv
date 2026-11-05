@@ -141,7 +141,7 @@ export const channels = [
   },
   {
     id: 11,
-    name: "INCTV (720p) [Geo-blocked]",
+    name: "INCTV",
     category: "PH LOCAL",
     logo: "https://placehold.co/300x170/1a1a2e/e94560?text=INCTV",
     sources: [
@@ -183,9 +183,9 @@ export const channels = [
   },
   {
     id: 14,
-    name: "BBC News Asia Pacific (720p)",
+    name: "BBC News Asia Pacific",
     category: "NEWS",
-    logo: "https://placehold.co/300x170/1a1a2e/e94560?text=BBC+News+Asia+Pacific",
+    logo: "https://placehold.co/300x170/1a1a2e/e94560?text=BBC+News+Asia",
     sources: [
       {
         name: "Server 1",
@@ -197,7 +197,7 @@ export const channels = [
   },
   {
     id: 15,
-    name: "CLTV 36 (720p) [Not 24/7]",
+    name: "CLTV 36",
     category: "NEWS",
     logo: "https://placehold.co/300x170/1a1a2e/e94560?text=CLTV+36",
     sources: [
@@ -211,9 +211,9 @@ export const channels = [
   },
   {
     id: 16,
-    name: "Bilyonario News Channel (720p) [Geo-blocked]",
+    name: "Bilyonario News",
     category: "NEWS",
-    logo: "https://placehold.co/300x170/1a1a2e/e94560?text=Bilyonario+News+Channel",
+    logo: "https://placehold.co/300x170/1a1a2e/e94560?text=Bilyonario+News",
     sources: [
       {
         name: "Server 1",
@@ -225,9 +225,9 @@ export const channels = [
   },
   {
     id: 17,
-    name: "EWTN Asia-Pacific (720p) [Not 24/7]",
+    name: "EWTN Asia-Pacific",
     category: "INTERNATIONAL",
-    logo: "https://placehold.co/300x170/1a1a2e/e94560?text=EWTN+Asia-Pacific",
+    logo: "https://placehold.co/300x170/1a1a2e/e94560?text=EWTN+Asia",
     sources: [
       {
         name: "Server 1",
@@ -283,7 +283,7 @@ export const channels = [
     id: 21,
     name: "CGTN News Live",
     category: "NEWS",
-    logo: "https://placehold.co/300x170/1a1a2e/e94560?text=CGTN+News+Live",
+    logo: "https://placehold.co/300x170/1a1a2e/e94560?text=CGTN+News",
     sources: [
       {
         name: "Server 1",
@@ -297,7 +297,7 @@ export const channels = [
     id: 22,
     name: "CGTN Documentaries",
     category: "NEWS",
-    logo: "https://placehold.co/300x170/1a1a2e/e94560?text=CGTN+Documentaries",
+    logo: "https://placehold.co/300x170/1a1a2e/e94560?text=CGTN+Docs",
     sources: [
       {
         name: "Server 1",
@@ -407,7 +407,7 @@ export const channels = [
   },
   {
     id: 30,
-    name: "Japanim TV (1080p)",
+    name: "Japanim TV",
     category: "KIDS",
     logo: "https://placehold.co/300x170/1a1a2e/e94560?text=Japanim+TV",
     sources: [
@@ -421,7 +421,7 @@ export const channels = [
   },
   {
     id: 31,
-    name: "Magic Kids (486p)",
+    name: "Magic Kids",
     category: "KIDS",
     logo: "https://placehold.co/300x170/1a1a2e/e94560?text=Magic+Kids",
     sources: [
@@ -449,7 +449,7 @@ export const channels = [
   },
   {
     id: 33,
-    name: "Yahoo! Finance (1080p)",
+    name: "Yahoo! Finance",
     category: "NEWS",
     logo: "https://placehold.co/300x170/1a1a2e/e94560?text=Yahoo!+Finance",
     sources: [
@@ -463,7 +463,7 @@ export const channels = [
   },
   {
     id: 34,
-    name: "EWTN Europe (720p) [Not 24/7]",
+    name: "EWTN Europe",
     category: "INTERNATIONAL",
     logo: "https://placehold.co/300x170/1a1a2e/e94560?text=EWTN+Europe",
     sources: [
