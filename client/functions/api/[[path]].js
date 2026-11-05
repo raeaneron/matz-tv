@@ -15,6 +15,46 @@ export async function onRequest(context) {
     return new Response(null, { status: 204, headers: corsHeaders });
   }
 
+  // Route: Live YouTube ID resolver
+  if (path.includes('/live-id')) {
+    const handle = url.searchParams.get('channel');
+    if (!handle) {
+      return new Response(JSON.stringify({ error: 'Channel handle required' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
+    try {
+      const cleanHandle = handle.startsWith('@') ? handle : `@${handle}`;
+      const res = await fetch(`https://www.youtube.com/${cleanHandle}/live`, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36'
+        },
+        redirect: 'follow'
+      });
+      const html = await res.text();
+      let videoId = null;
+      const match1 = html.match(/canonical" href="https:\/\/www\.youtube\.com\/watch\?v=([a-zA-Z0-9_-]{11})"/);
+      if (match1) {
+        videoId = match1[1];
+      } else {
+        const match2 = html.match(/"videoId":"([a-zA-Z0-9_-]{11})"/);
+        if (match2) videoId = match2[1];
+      }
+
+      return new Response(JSON.stringify({ handle: cleanHandle, videoId }), {
+        status: 200,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    } catch (e) {
+      return new Response(JSON.stringify({ error: e.message }), {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+  }
+
   // Route: Proxy
   if (path.includes('/proxy')) {
     const targetUrl = url.searchParams.get('url');
