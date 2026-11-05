@@ -1,30 +1,446 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* ─── MATZ TV — Retro CRT TV + Vintage Radio ─────────────────────────────── */
 
-* {
+:root {
+  --bg: #e9edf1;
+  --fg: #1c2530;
+  --muted: #566474;
+  --chip: #fff;
+  --wood1: #6e4024;
+  --wood2: #47280f;
+  --teal1: #22766f;
+  --teal2: #154a47;
+  --amber: #ffb33a;
+  --lcd: #1a1204;
+  --brass: #c9a24a;
   box-sizing: border-box;
-  -webkit-tap-highlight-color: transparent;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e1620;
+    --fg: #e8edf2;
+    --muted: #93a1b0;
+    --chip: #1a2633;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: #0e1620;
+  --fg: #e8edf2;
+  --muted: #93a1b0;
+  --chip: #1a2633;
+}
+
+html {
+  scroll-padding-top: env(safe-area-inset-top, 0px);
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
 }
 
 body {
-  background: #080808;
-  color: white;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  overscroll-behavior: none;
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font: 16px/1.5 "Syne", system-ui, sans-serif;
 }
 
-/* Custom scrollbar */
-::-webkit-scrollbar { width: 4px; }
-::-webkit-scrollbar-track { background: #0a0a0a; }
-::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 2px; }
-::-webkit-scrollbar-thumb:hover { background: #3a3a3a; }
-
-/* Sound wave animation for radio */
-@keyframes soundwave {
-  0%, 100% { transform: scaleY(0.4); }
-  50% { transform: scaleY(1); }
+main {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 28px 16px 56px;
 }
 
-/* Smooth transitions */
-.transition-all { transition-duration: 150ms; }
+h1 {
+  font-size: clamp(28px, 5vw, 44px);
+  font-weight: 800;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.sub {
+  color: var(--muted);
+  margin: 4px 0 28px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1.45fr 1fr;
+  gap: 32px;
+  align-items: start;
+}
+
+@media (max-width: 880px) {
+  .grid { grid-template-columns: 1fr; }
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+}
+
+:focus-visible {
+  outline: 3px solid #ffd36b;
+  outline-offset: 2px;
+}
+
+/* ─── RETRO TV ──────────────────────────────────────────────────────────── */
+
+.retro-tv {
+  position: relative;
+  padding-top: 52px;
+}
+
+/* Antenna */
+.ant {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 0;
+  height: 0;
+}
+.ant::before,
+.ant::after {
+  content: "";
+  position: absolute;
+  bottom: -4px;
+  width: 3px;
+  height: 58px;
+  background: #a5afb9;
+  border-radius: 2px;
+  transform-origin: bottom;
+}
+.ant::before { transform: rotate(-30deg); }
+.ant::after  { transform: rotate(30deg); }
+
+/* Wooden cabinet */
+.cab {
+  background: linear-gradient(145deg, var(--wood1), var(--wood2));
+  border-radius: 26px;
+  padding: 18px;
+  display: grid;
+  grid-template-columns: 1fr 84px;
+  gap: 16px;
+  box-shadow:
+    0 18px 40px rgba(0,0,0,.35),
+    inset 0 2px 0 rgba(255,255,255,.14);
+}
+
+@media (max-width: 560px) {
+  .cab { grid-template-columns: 1fr; }
+  .side { flex-direction: row !important; flex-wrap: wrap; }
+}
+
+/* CRT bezel */
+.bezel {
+  background: #0a0a0a;
+  border-radius: 24px / 20px;
+  padding: 14px;
+  box-shadow:
+    inset 0 0 0 3px #222,
+    inset 0 6px 16px #000;
+}
+
+/* CRT screen */
+.screen {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  border-radius: 16px / 14px;
+  overflow: hidden;
+  background: #000;
+  cursor: pointer;
+}
+
+.screen video,
+.screen canvas,
+.screen iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.screen canvas {
+  image-rendering: pixelated;
+}
+
+/* Scanlines overlay */
+.scanlines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(0,0,0,.14) 0 1px,
+    transparent 1px 3px
+  );
+  box-shadow: inset 0 0 70px rgba(0,0,0,.65);
+  z-index: 10;
+}
+
+/* Green phosphor OSD */
+.osd {
+  position: absolute;
+  z-index: 11;
+  top: 10px;
+  left: 14px;
+  font: 20px "Share Tech Mono", monospace;
+  color: #7dff9b;
+  text-shadow: 0 0 6px #2bff6a;
+  pointer-events: none;
+}
+
+.msg {
+  position: absolute;
+  z-index: 11;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  padding: 16px;
+  font: 22px "Share Tech Mono", monospace;
+  color: #fff;
+  text-shadow: 0 0 8px #000;
+  pointer-events: none;
+}
+
+/* Fullscreen */
+.screen:fullscreen { aspect-ratio: auto; border-radius: 0; width: 100%; height: 100%; }
+.screen:-webkit-full-screen { aspect-ratio: auto; border-radius: 0; width: 100%; height: 100%; }
+.screen:fullscreen .osd { font-size: 30px; }
+
+/* Side knobs panel */
+.side {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 14px;
+}
+
+/* Brass knob buttons */
+.knob {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  border: 0;
+  color: #2a1a08;
+  font-weight: 800;
+  font-size: 13px;
+  background: radial-gradient(circle at 35% 30%, #efe0ae, #b08a3a 60%, #6d531e);
+  box-shadow:
+    0 4px 8px rgba(0,0,0,.5),
+    inset 0 -3px 5px rgba(0,0,0,.3);
+  transition: transform .1s;
+}
+.knob:active { transform: translateY(2px); }
+
+/* Power LED */
+.led {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #400;
+  box-shadow: 0 0 0 2px #2a1508;
+}
+.led.on {
+  background: #ff4d3a;
+  box-shadow: 0 0 10px #ff4d3a, 0 0 0 2px #2a1508;
+}
+
+/* Category chips */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-top: 16px;
+}
+
+.chip {
+  border: 1.5px solid var(--muted);
+  background: var(--chip);
+  color: var(--fg);
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-weight: 500;
+  transition: background .15s, color .15s;
+}
+.chip[aria-pressed="true"] {
+  background: var(--fg);
+  color: var(--bg);
+  border-color: var(--fg);
+}
+
+.now {
+  margin: 10px 2px 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+/* ─── CHANNEL GUIDE ─────────────────────────────────────────────────────── */
+
+.guide {
+  background: var(--chip);
+  border-radius: 20px;
+  padding: 14px;
+  box-shadow: 0 6px 20px rgba(0,0,0,.15);
+}
+
+.guide h2 {
+  font-size: 18px;
+  font-weight: 800;
+  margin: 0 0 8px;
+}
+
+.guide ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+  max-height: 340px;
+  overflow-y: auto;
+}
+
+.guide button {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 32px 1fr auto;
+  gap: 10px;
+  align-items: center;
+  text-align: left;
+  border: 1.5px solid transparent;
+  background: transparent;
+  color: var(--fg);
+  border-radius: 12px;
+  padding: 8px 10px;
+  transition: border-color .15s, background .15s;
+}
+
+.guide button:hover { border-color: var(--muted); }
+.guide button[aria-current="true"] { background: var(--fg); color: var(--bg); }
+.guide .num { font: 18px "Share Tech Mono", monospace; }
+.guide .nm { font-weight: 800; display: block; }
+.guide .in  { font-size: 13px; opacity: .75; display: block; }
+.guide .live { font-size: 12px; font-weight: 800; color: #ff4d3a; }
+
+/* Right column */
+.right { display: grid; gap: 24px; }
+
+/* ─── VINTAGE RADIO ─────────────────────────────────────────────────────── */
+
+.radio {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+  border-radius: 30px;
+  color: #f1fbfa;
+  background: linear-gradient(160deg, var(--teal1), var(--teal2));
+  box-shadow:
+    0 18px 40px rgba(0,0,0,.35),
+    inset 0 2px 0 rgba(255,255,255,.2);
+}
+
+/* Speaker grille */
+.grille {
+  height: 56px;
+  border-radius: 14px;
+  background:
+    repeating-linear-gradient(90deg, rgba(0,0,0,.4) 0 3px, transparent 3px 9px),
+    #0e3836;
+  box-shadow: inset 0 3px 8px #000;
+}
+
+/* Amber LCD display */
+.lcd {
+  background: var(--lcd);
+  border: 3px solid #0b3230;
+  border-radius: 14px;
+  padding: 14px 16px;
+  color: var(--amber);
+  font-family: "Share Tech Mono", monospace;
+  box-shadow: inset 0 0 26px #000;
+}
+.lcd .top  { display: flex; justify-content: space-between; gap: 10px; font-size: 14px; opacity: .85; }
+.lcd .name { font: 800 24px/1.2 "Syne", sans-serif; margin: 6px 0 0; color: var(--amber); }
+.lcd .freq { font-size: 40px; line-height: 1.1; }
+.lcd .desc { font-size: 14px; opacity: .85; min-height: 2.6em; }
+
+/* Equalizer bars */
+.eq {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 72px;
+  margin-top: 8px;
+}
+.eq i {
+  flex: 1;
+  height: 4%;
+  background: repeating-linear-gradient(to top, var(--amber) 0 4px, transparent 4px 6px);
+  transition: height .05s linear;
+}
+
+/* Frequency dial */
+.dial {
+  position: relative;
+  height: 34px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #f0e5c6;
+  box-shadow: inset 0 2px 6px rgba(0,0,0,.45);
+}
+.dial::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 50% 0;
+  background: repeating-linear-gradient(90deg, #6a5a34 0 1px, transparent 1px 12px);
+}
+.needle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: #d93a2a;
+  transition: left .4s ease;
+}
+
+/* Preset chips (teal style) */
+.presets { display: flex; flex-wrap: wrap; gap: 8px; }
+.presets .chip {
+  background: rgba(255,255,255,.12);
+  color: #f1fbfa;
+  border-color: rgba(255,255,255,.5);
+  font-size: 12px;
+  padding: 4px 10px;
+}
+.presets .chip[aria-pressed="true"] {
+  background: #f1fbfa;
+  color: #154a47;
+}
+
+/* Play control row */
+.ctrl {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.play {
+  width: 64px;
+  height: 64px;
+  font-size: 24px;
+  flex: none;
+}
+.ctrl input {
+  flex: 1;
+  accent-color: var(--brass);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .needle { transition: none; }
+  .eq i   { transition: none; }
+}
