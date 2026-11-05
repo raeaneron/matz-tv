@@ -1,85 +1,82 @@
-const HEADERS = {
-  'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-  'Accept': '*/*',
-  'Origin': 'https://iyadtv.pages.dev',
-  'Referer': 'https://iyadtv.pages.dev/'
-};
-
 exports.handler = async (event, context) => {
-  try {
-    const url = event.queryStringParameters.url;
-    if (!url) {
-      return { statusCode: 400, body: 'URL required' };
-    }
+  const corsHeaders = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization, Range',
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Access-Control-Expose-Headers': 'Content-Length, Content-Range, Content-Type'
+  };
 
-    const response = await fetch(url, { headers: HEADERS });
+  if (event.httpMethod === 'OPTIONS') {
+    return { statusCode: 204, headers: corsHeaders, body: '' };
+  }
+
+  const targetUrl = event.queryStringParameters && event.queryStringParameters.url;
+  if (!targetUrl) {
+    return { statusCode: 400, headers: corsHeaders, body: 'URL parameter required' };
+  }
+
+  try {
+    const fetchHeaders = {
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+      'Accept': '*/*'
+    };
+
+    const response = await fetch(targetUrl, { headers: fetchHeaders });
     if (!response.ok) {
-      return { statusCode: response.status, body: 'Proxy fetch failed' };
+      return {
+        statusCode: response.status,
+        headers: corsHeaders,
+        body: `Upstream error: ${response.status}`
+      };
     }
 
     let contentType = response.headers.get('content-type') || 'application/octet-stream';
-    if (url.includes('.m3u8')) contentType = 'application/vnd.apple.mpegurl';
-    else if (url.includes('.ts')) contentType = 'video/MP2T';
-    else if (url.includes('.mpd')) contentType = 'application/dash+xml';
+    if (targetUrl.includes('.m3u8')) contentType = 'application/vnd.apple.mpegurl';
+    else if (targetUrl.includes('.ts')) contentType = 'video/MP2T';
+    else if (targetUrl.includes('.mpd')) contentType = 'application/dash+xml';
+    else if (targetUrl.includes('.mp3')) contentType = 'audio/mpeg';
+    else if (targetUrl.includes('.aac')) contentType = 'audio/aac';
 
-    const corsHeaders = {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-      'Content-Type': contentType
-    };
+    const responseHeaders = { ...corsHeaders, 'Content-Type': contentType };
 
-    if (url.includes('.m3u8') || url.includes('.mpd')) {
+    if (targetUrl.includes('.m3u8')) {
       let text = await response.text();
-      const finalUrl = response.url.split('?')[0];
-      const baseUrl = finalUrl.substring(0, finalUrl.lastIndexOf('/') + 1);
-      const host = event.headers.host;
-      const protocol = event.headers['x-forwarded-proto'] || 'https';
-      
-      if (url.includes('.m3u8')) {
-        text = text.split('\n').map(line => {
-          if (line.trim() && !line.startsWith('#')) {
-            const absoluteUrl = line.startsWith('http') ? line : baseUrl + line;
-            if (absoluteUrl.includes('.ts')) {
-              return `${protocol}://${host}/.netlify/functions/proxy?url=${encodeURIComponent(absoluteUrl)}`;
-            }
-            const ext = absoluteUrl.includes('.m3u8') ? '/stream.m3u8' : '';
-            return `${protocol}://${host}/.netlify/functions/proxy${ext}?url=${encodeURIComponent(absoluteUrl)}`;
-          }
-          if (line.includes('URI="')) {
-            return line.replace(/URI="([^"]+)"/, (match, p1) => {
-               const absoluteUrl = p1.startsWith('http') ? p1 : baseUrl + p1;
-               if (absoluteUrl.includes('.ts')) {
-                 return `URI="${protocol}://${host}/.netlify/functions/proxy?url=${encodeURIComponent(absoluteUrl)}"`;
-               }
-               const ext = absoluteUrl.includes('.m3u8') ? '/stream.m3u8' : '';
-               return `URI="${protocol}://${host}/.netlify/functions/proxy${ext}?url=${encodeURIComponent(absoluteUrl)}"`;
-            });
-          }
-          return line;
-        }).join('\n');
-      }
-      
-      return {
-        statusCode: 200,
-        headers: corsHeaders,
-        body: text
-      };
-    } else {
-      const arrayBuffer = await response.arrayBuffer();
-      const buffer = Buffer.from(arrayBuffer);
-      return {
-        statusCode: 200,
-        headers: corsHeaders,
-        body: buffer.toString('base64'),
-        isBase64Encoded: true
-      };
+      const cleanTarget = targetUrl.split('?')[0];
+      const baseUrl = cleanTarget.substring(0, cleanTarget.lastIndexOf('/') + 1);
+      const host = event.headers.host || 'matztv.netlify.app';
+      const proto = event.headers['x-forwarded-proto'] || 'https';
+
+      text = text.split('\n').map(line => {
+        const trimmed = line.trim();
+        if (trimmed && !trimmed.startsWith('#')) {
+          const absoluteUrl = trimmed.startsWith('http') ? trimmed : baseUrl + trimmed;
+          return `${proto}://${host}/.netlify/functions/proxy?url=${encodeURIComponent(absoluteUrl)}`;
+        }
+        if (line.includes('URI="')) {
+          return line.replace(/URI="([^"]+)"/, (match, p1) => {
+            const absoluteUrl = p1.startsWith('http') ? p1 : baseUrl + p1;
+            return `URI="${proto}://${host}/.netlify/functions/proxy?url=${encodeURIComponent(absoluteUrl)}"`;
+          });
+        }
+        return line;
+      }).join('\n');
+
+      return { statusCode: 200, headers: responseHeaders, body: text };
     }
-  } catch (e) {
-    console.error(e);
+
+    const arrayBuffer = await response.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
     return {
-      statusCode: 500,
-      body: 'Internal Server Error: ' + e.message
+      statusCode: 200,
+      headers: responseHeaders,
+      body: buffer.toString('base64'),
+      isBase64Encoded: true
+    };
+  } catch (err) {
+    return {
+      statusCode: 502,
+      headers: corsHeaders,
+      body: `Proxy fetch failed: ${err.message}`
     };
   }
 };
