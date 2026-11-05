@@ -6,6 +6,8 @@ import 'plyr/dist/plyr.css'
 import { useEffect, useRef } from 'react'
 import { ArrowLeft } from 'lucide-react'
 
+const PROXY_PATH = '/api/proxy';
+
 export default function Watch() {
   const { id } = useParams()
   const videoRef = useRef(null)
@@ -16,8 +18,20 @@ export default function Watch() {
     if (!channel) return
 
     const video = videoRef.current
+    const source = channel.sources[0];
+    if (!source) return;
+
+    let streamUrl = source.url.trim();
+    const streamType = source.type || (streamUrl.includes('.mpd') ? 'mpd' : 'hls');
+
+    // Proxy http:// streams to avoid mixed-content on HTTPS
+    if (streamUrl.startsWith('http://') || streamUrl.includes('.mpd')) {
+      const ext = streamUrl.includes('.mpd') ? '/stream.mpd' : (streamUrl.includes('.m3u8') ? '/stream.m3u8' : '');
+      streamUrl = `${PROXY_PATH}${ext}?url=${encodeURIComponent(streamUrl)}`;
+    }
 
     let hls;
+    let player;
 
     const defaultOptions = {
       controls: [
@@ -39,25 +53,33 @@ export default function Watch() {
       ],
     };
 
-    if (video.canPlayType('application/vnd.apple.mpegurl')) {
-      // Native HLS playback support (e.g., Safari / iOS)
-      video.src = channel.stream;
+    if (streamType === 'mpd') {
+      // DASH streams handled by shaka-player (loaded globally via CDN in index.html)
+      if (window.shaka) {
+        window.shaka.polyfill.installAll();
+        const shakaPlayer = new window.shaka.Player(video);
+        shakaPlayer.load(streamUrl).catch(console.error);
+        player = shakaPlayer;
+      } else {
+        video.src = streamUrl;
+        new Plyr(video, defaultOptions);
+      }
+    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+      // Native HLS (Safari / iOS)
+      video.src = streamUrl;
       new Plyr(video, defaultOptions);
     } else if (Hls.isSupported()) {
-      // Use Hls.js
       hls = new Hls()
-      hls.loadSource(channel.stream)
+      hls.loadSource(streamUrl)
       hls.attachMedia(video)
-      
       hls.on(Hls.Events.MANIFEST_PARSED, function () {
         new Plyr(video, defaultOptions);
       });
     }
 
     return () => {
-      if (hls) {
-        hls.destroy();
-      }
+      if (hls) hls.destroy();
+      if (player && player.destroy) player.destroy();
     }
   }, [channel])
 
