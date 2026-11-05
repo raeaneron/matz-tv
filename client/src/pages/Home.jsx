@@ -1,180 +1,204 @@
 import { useState, useEffect, useRef } from 'react';
-import { Tv, Radio, Search, Play, Pause, X, Loader2, ChevronRight, Volume2, Wifi } from 'lucide-react';
+import { Tv, Radio, Search, Play, Pause, X, Loader2, ChevronRight, Volume2, Wifi, LayoutGrid, List } from 'lucide-react';
 import Player from '../components/Player';
-import { iptvService } from '../services/iptv';
+import { channels as channelList } from '../data/channels';
 import { radioStations } from '../data/radio';
 import Hls from 'hls.js';
 
 const TV_CATEGORIES = ['ALL', 'PH LOCAL', 'NEWS', 'SPORTS', 'KIDS', 'INTERNATIONAL'];
 const RADIO_REGIONS = ['ALL', 'Metro Manila', 'Luzon', 'Visayas', 'Mindanao', 'International'];
 
-// --- TV Section ---
+// --- TV Section (PinasDex-style Live TV) ---
 function TVSection() {
-  const [channels, setChannels] = useState([]);
+  const [channels] = useState(channelList);
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('ALL');
-  const [selectedChannel, setSelectedChannel] = useState(null);
-  const [activeSource, setActiveSource] = useState(null);
-  const [isFetchingSource, setIsFetchingSource] = useState(false);
-  const [streamError, setStreamError] = useState(null);
-
-  useEffect(() => {
-    iptvService.fetchChannels().then(setChannels);
-  }, []);
+  const [selectedChannel, setSelectedChannel] = useState(channels[0] || null); // Auto-load first channel like PinasDex
+  const [viewMode, setViewMode] = useState('list'); // Default list for PinasDex TV guide look
 
   const filtered = channels.filter(c => {
     const matchCat = category === 'ALL' || c.category === category;
-    const matchSearch = c.name.toLowerCase().includes(search.toLowerCase());
+    const matchSearch = c.name.toLowerCase().includes(search.toLowerCase()) || (c.title && c.title.toLowerCase().includes(search.toLowerCase()));
     return matchCat && matchSearch;
   });
 
-  const handlePlay = async (channel, source) => {
-    setSelectedChannel(channel);
-    setIsFetchingSource(true);
-    setStreamError(null);
-    setActiveSource(null);
-    if (!window.globalTriedSources) window.globalTriedSources = new Set();
-    window.globalTriedSources.add(source.name);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+  const currentIndex = channels.findIndex(c => c.id === selectedChannel?.id);
 
-    try {
-      const info = await iptvService.fetchStream(channel.name, source.index);
-      setActiveSource({ name: source.name, url: info.url, type: info.type });
-    } catch (e) {
-      setStreamError('Stream unavailable. Try another channel or server.');
-    } finally {
-      setIsFetchingSource(false);
-    }
+  const handleNext = () => {
+    if (channels.length === 0) return;
+    const nextIdx = (currentIndex + 1) % channels.length;
+    setSelectedChannel(channels[nextIdx]);
+  };
+
+  const handlePrev = () => {
+    if (channels.length === 0) return;
+    const prevIdx = (currentIndex - 1 + channels.length) % channels.length;
+    setSelectedChannel(channels[prevIdx]);
   };
 
   const handleChannelClick = (channel) => {
-    if (window.globalTriedSources) window.globalTriedSources.clear();
-    handlePlay(channel, channel.sources[0]);
-  };
-
-  const handleClose = () => {
-    setActiveSource(null);
-    setSelectedChannel(null);
-    setStreamError(null);
+    setSelectedChannel(channel);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
     <div className="flex flex-col h-full">
-      {/* Player Area */}
-      {(isFetchingSource || activeSource || streamError) && (
-        <div className="w-full bg-black mb-4 rounded-xl overflow-hidden border border-white/5">
-          {isFetchingSource && (
-            <div className="aspect-video flex flex-col items-center justify-center bg-[#0d0d0d]">
-              <Loader2 className="w-8 h-8 text-red-500 animate-spin mb-2" />
-              <p className="text-zinc-500 text-xs">Connecting to stream...</p>
-            </div>
-          )}
-          {!isFetchingSource && streamError && (
-            <div className="aspect-video flex flex-col items-center justify-center bg-[#0d0d0d] p-4 text-center">
-              <X className="w-8 h-8 text-red-500 mb-2" />
-              <p className="text-zinc-400 text-sm mb-3">{streamError}</p>
-              <button onClick={handleClose} className="px-4 py-1.5 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-xs font-bold transition">
-                CLOSE
-              </button>
-            </div>
-          )}
-          {!isFetchingSource && activeSource && selectedChannel && (
-            <div>
-              <Player
-                source={activeSource}
-                channelName={selectedChannel.name}
-                onClose={handleClose}
-                availableSources={selectedChannel.sources}
-                onSwitchSource={(s) => handlePlay(selectedChannel, s)}
-              />
-              {selectedChannel.sources.length > 1 && (
-                <div className="flex flex-wrap items-center gap-2 px-3 py-2 bg-[#0d0d0d] border-t border-white/5">
-                  <span className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest">Servers:</span>
-                  {selectedChannel.sources.map((s, i) => (
-                    <button
-                      key={i}
-                      onClick={() => handlePlay(selectedChannel, s)}
-                      className={`px-3 py-1 rounded-md text-[10px] font-bold border transition ${
-                        activeSource.name === s.name
-                          ? 'bg-red-600 border-red-500 text-white'
-                          : 'bg-zinc-800 border-white/5 text-zinc-400 hover:text-white hover:bg-zinc-700'
-                      }`}
-                    >
-                      {s.name}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-        </div>
+      {/* Prominent Screen Player (PinasDex style) */}
+      {selectedChannel && (
+        <Player
+          channel={selectedChannel}
+          onClose={() => setSelectedChannel(null)}
+          onNext={handleNext}
+          onPrev={handlePrev}
+        />
       )}
 
-      {/* Search + Category Filters */}
-      <div className="flex flex-col sm:flex-row gap-2 mb-4">
-        <div className="relative flex-1">
-          <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" />
-          <input
-            type="text"
-            placeholder="Search channels..."
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            className="w-full pl-8 pr-3 py-2 bg-[#111] border border-white/5 rounded-lg text-sm outline-none focus:border-red-500/50 placeholder:text-zinc-600"
-          />
-        </div>
-        <div className="flex gap-1 flex-wrap">
+      {/* Guide Header & Filters */}
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 mb-4 mt-2">
+        {/* Category Pills */}
+        <div className="flex gap-1.5 flex-wrap">
           {TV_CATEGORIES.map(cat => (
             <button
               key={cat}
               onClick={() => setCategory(cat)}
-              className={`px-3 py-1.5 rounded-lg text-[10px] font-bold tracking-wide transition border ${
+              className={`px-3 py-1.5 rounded-lg text-[10px] font-black tracking-wider uppercase transition border ${
                 category === cat
-                  ? 'bg-red-600 border-red-500 text-white'
-                  : 'bg-[#111] border-white/5 text-zinc-500 hover:text-white hover:border-white/20'
+                  ? 'bg-red-600 border-red-500 text-white shadow-md'
+                  : 'bg-[#111] border-white/5 text-zinc-400 hover:text-white hover:border-white/20'
               }`}
             >
               {cat}
             </button>
           ))}
         </div>
+
+        {/* Search & View Toggle */}
+        <div className="flex items-center gap-2">
+          <div className="relative flex-1 sm:w-56">
+            <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" />
+            <input
+              type="text"
+              placeholder="Search channels..."
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              className="w-full pl-8 pr-3 py-1.5 bg-[#111] border border-white/5 rounded-lg text-xs outline-none focus:border-red-500/50 placeholder:text-zinc-600"
+            />
+          </div>
+
+          <div className="flex bg-[#111] border border-white/5 rounded-lg p-0.5">
+            <button
+              onClick={() => setViewMode('list')}
+              className={`p-1.5 rounded-md transition ${viewMode === 'list' ? 'bg-red-600 text-white' : 'text-zinc-500 hover:text-white'}`}
+              title="Guide List View"
+            >
+              <List size={14} />
+            </button>
+            <button
+              onClick={() => setViewMode('grid')}
+              className={`p-1.5 rounded-md transition ${viewMode === 'grid' ? 'bg-red-600 text-white' : 'text-zinc-500 hover:text-white'}`}
+              title="Card Grid View"
+            >
+              <LayoutGrid size={14} />
+            </button>
+          </div>
+        </div>
       </div>
 
-      {/* Channel Grid */}
-      <div className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 gap-2">
-        {filtered.map(channel => (
-          <button
-            key={channel.id}
-            onClick={() => handleChannelClick(channel)}
-            className={`group relative bg-[#111] hover:bg-[#1a1a1a] border rounded-xl overflow-hidden transition-all active:scale-95 text-left flex flex-col ${
-              selectedChannel?.id === channel.id
-                ? 'border-red-500/60 ring-1 ring-red-500/40'
-                : 'border-white/5 hover:border-white/20'
-            }`}
-          >
-            <div className="relative w-full aspect-video bg-black flex items-center justify-center overflow-hidden">
-              <img
-                src={channel.logo}
-                alt={channel.name}
-                loading="lazy"
-                className="w-full h-full object-cover opacity-75 group-hover:opacity-95 transition-opacity"
-              />
-              <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                <div className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center shadow-lg">
-                  <Play size={12} className="fill-white text-white ml-0.5" />
+      {/* PinasDex-style Channel Guide List */}
+      {viewMode === 'list' ? (
+        <div className="flex flex-col gap-1.5 max-w-4xl">
+          {filtered.map(channel => {
+            const isCur = selectedChannel?.id === channel.id;
+            return (
+              <button
+                key={channel.id}
+                onClick={() => handleChannelClick(channel)}
+                className={`flex items-center gap-3.5 p-3 rounded-xl border text-left transition-all active:scale-[0.99] group ${
+                  isCur
+                    ? 'bg-red-600/15 border-red-500/60 shadow-lg ring-1 ring-red-500/30'
+                    : 'bg-[#111] border-white/5 hover:bg-[#181818] hover:border-white/15'
+                }`}
+              >
+                {/* Channel Number */}
+                <span
+                  className={`w-9 h-9 rounded-lg flex items-center justify-center font-black text-xs flex-shrink-0 transition ${
+                    isCur
+                      ? 'bg-red-600 text-white'
+                      : 'bg-zinc-800/80 text-zinc-400 group-hover:bg-zinc-700 group-hover:text-white'
+                  }`}
+                >
+                  {channel.ch}
+                </span>
+
+                {/* Logo */}
+                <div className="w-10 h-7 bg-black rounded overflow-hidden flex items-center justify-center p-0.5 flex-shrink-0 border border-white/5">
+                  <img src={channel.logo} alt="" className="w-full h-full object-contain" />
                 </div>
-              </div>
-              <div className="absolute top-1.5 left-1.5 flex items-center gap-1 bg-black/75 rounded px-1.5 py-0.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span>
-                <span className="text-[8px] font-bold text-white tracking-widest">LIVE</span>
-              </div>
-            </div>
-            <div className="p-2">
-              <p className="text-xs font-bold text-zinc-100 truncate leading-tight">{channel.name}</p>
-              <p className="text-[9px] text-zinc-600 font-medium uppercase tracking-wider mt-0.5">{channel.category}</p>
-            </div>
-          </button>
-        ))}
-      </div>
+
+                {/* Info */}
+                <div className="flex-1 overflow-hidden">
+                  <div className="flex items-center gap-2">
+                    <p className={`text-sm font-black truncate ${isCur ? 'text-red-400' : 'text-zinc-100 group-hover:text-white'}`}>
+                      {channel.name}
+                    </p>
+                    <span className="text-[9px] font-bold text-zinc-500 uppercase px-1.5 py-0.2 bg-zinc-900 rounded">
+                      {channel.category}
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-zinc-400 truncate mt-0.5">
+                    {channel.title || 'Live Broadcast Stream'}
+                  </p>
+                </div>
+
+                {/* Live Indicator */}
+                <div className="flex items-center gap-1.5 ml-2 flex-shrink-0">
+                  <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+                  <span className="text-[9px] font-black text-zinc-400 tracking-widest hidden sm:inline">LIVE</span>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      ) : (
+        /* Grid View */
+        <div className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 gap-2">
+          {filtered.map(channel => {
+            const isCur = selectedChannel?.id === channel.id;
+            return (
+              <button
+                key={channel.id}
+                onClick={() => handleChannelClick(channel)}
+                className={`group relative bg-[#111] hover:bg-[#1a1a1a] border rounded-xl overflow-hidden transition-all active:scale-95 text-left flex flex-col ${
+                  isCur
+                    ? 'border-red-500/60 ring-1 ring-red-500/40 bg-red-600/10'
+                    : 'border-white/5 hover:border-white/20'
+                }`}
+              >
+                <div className="relative w-full aspect-video bg-black flex items-center justify-center overflow-hidden">
+                  <img
+                    src={channel.logo}
+                    alt={channel.name}
+                    loading="lazy"
+                    className="w-full h-full object-cover opacity-75 group-hover:opacity-95 transition-opacity"
+                  />
+                  <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center shadow-lg">
+                      <Play size={12} className="fill-white text-white ml-0.5" />
+                    </div>
+                  </div>
+                  <div className="absolute top-1.5 left-1.5 flex items-center gap-1 bg-black/75 rounded px-1.5 py-0.5">
+                    <span className="text-[8px] font-black text-red-500">CH {channel.ch}</span>
+                  </div>
+                </div>
+                <div className="p-2">
+                  <p className="text-xs font-bold text-zinc-100 truncate leading-tight">{channel.name}</p>
+                  <p className="text-[9px] text-zinc-500 truncate mt-0.5">{channel.title}</p>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      )}
 
       {filtered.length === 0 && (
         <div className="flex flex-col items-center justify-center py-20 text-zinc-700">
@@ -190,7 +214,7 @@ function TVSection() {
 function RadioSection() {
   const [region, setRegion] = useState('ALL');
   const [search, setSearch] = useState('');
-  const [playing, setPlaying] = useState(null); // { station, state: 'loading'|'playing'|'error' }
+  const [playing, setPlaying] = useState(null);
   const audioRef = useRef(null);
   const hlsRef = useRef(null);
 
@@ -225,13 +249,11 @@ function RadioSection() {
     const audio = audioRef.current;
     if (!audio) return;
 
-    // Resolve URL (proxy http:// streams to avoid mixed-content blocks)
     let streamUrl = station.url;
     if (streamUrl.startsWith('http://')) {
       streamUrl = `/api/proxy?url=${encodeURIComponent(streamUrl)}`;
     }
 
-    // Check if stream is HLS audio (.m3u8)
     if (station.url.includes('.m3u8')) {
       if (Hls.isSupported()) {
         const hls = new Hls({ enableWorker: true });
@@ -244,23 +266,16 @@ function RadioSection() {
             .catch(() => setPlaying({ station, state: 'error' }));
         });
         hls.on(Hls.Events.ERROR, (_e, data) => {
-          if (data.fatal) {
-            setPlaying({ station, state: 'error' });
-          }
+          if (data.fatal) setPlaying({ station, state: 'error' });
         });
         return;
       }
     }
 
-    // Standard audio (MP3 / AAC)
     audio.src = streamUrl;
     audio.play()
-      .then(() => {
-        setPlaying({ station, state: 'playing' });
-      })
-      .catch((err) => {
-        console.error("Audio playback error:", err);
-        // Fallback: try proxying through server
+      .then(() => setPlaying({ station, state: 'playing' }))
+      .catch(() => {
         if (!streamUrl.includes('/api/proxy')) {
           const proxied = `/api/proxy?url=${encodeURIComponent(station.url)}`;
           audio.src = proxied;
@@ -274,9 +289,7 @@ function RadioSection() {
   };
 
   useEffect(() => {
-    return () => {
-      stopRadio();
-    };
+    return () => stopRadio();
   }, []);
 
   return (
@@ -321,7 +334,7 @@ function RadioSection() {
         </div>
       )}
 
-      {/* Filters */}
+      {/* Region Filters */}
       <div className="flex flex-col sm:flex-row gap-2 mb-4">
         <div className="relative flex-1">
           <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" />
@@ -416,7 +429,7 @@ function RadioSection() {
   );
 }
 
-// --- Main App ---
+// --- Main App Shell ---
 export default function Home() {
   const [tab, setTab] = useState('tv');
 
@@ -437,7 +450,7 @@ export default function Home() {
           <button
             onClick={() => setTab('tv')}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition ${
-              tab === 'tv' ? 'bg-red-600 text-white' : 'text-zinc-400 hover:text-white hover:bg-white/5'
+              tab === 'tv' ? 'bg-red-600 text-white shadow' : 'text-zinc-400 hover:text-white hover:bg-white/5'
             }`}
           >
             <Tv size={15} /> Live TV
@@ -445,7 +458,7 @@ export default function Home() {
           <button
             onClick={() => setTab('radio')}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition ${
-              tab === 'radio' ? 'bg-red-600 text-white' : 'text-zinc-400 hover:text-white hover:bg-white/5'
+              tab === 'radio' ? 'bg-red-600 text-white shadow' : 'text-zinc-400 hover:text-white hover:bg-white/5'
             }`}
           >
             <Radio size={15} /> Radio
@@ -456,7 +469,7 @@ export default function Home() {
 
         <div className="hidden sm:flex items-center gap-1.5 text-xs text-zinc-500">
           <Wifi size={12} className="text-green-500" />
-          <span>Free Streaming</span>
+          <span>Free Broadcasts</span>
         </div>
       </header>
 
@@ -469,27 +482,15 @@ export default function Home() {
           <SidebarBtn icon={<Radio size={16} />} label="Radio" active={tab === 'radio'} onClick={() => setTab('radio')} />
 
           <div className="mt-6 mx-2 p-3 bg-red-600/10 border border-red-500/20 rounded-xl">
-            <p className="text-[10px] font-bold text-red-400 mb-1">📡 Free Broadcasts</p>
+            <p className="text-[10px] font-bold text-red-400 mb-1">📺 PinasDex Guide</p>
             <p className="text-[9px] text-zinc-500 leading-relaxed">
-              Philippine & International TV channels + Live Radio streams. No subscription needed.
+              Flip through Philippine TV channels and live radio stations without subscriptions.
             </p>
           </div>
         </aside>
 
         {/* Content Area */}
         <main className="flex-1 overflow-y-auto p-4 lg:p-6">
-          <div className="flex items-center gap-3 mb-5">
-            <div className="w-1 h-6 bg-red-600 rounded-full"></div>
-            <div>
-              <h1 className="text-lg font-black text-white">
-                {tab === 'tv' ? 'Live TV Channels' : 'Online Radio'}
-              </h1>
-              <p className="text-[11px] text-zinc-500">
-                {tab === 'tv' ? '31 live TV channels' : '18 live radio stations'}
-              </p>
-            </div>
-          </div>
-
           {tab === 'tv' ? <TVSection /> : <RadioSection />}
         </main>
       </div>
