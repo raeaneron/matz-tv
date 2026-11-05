@@ -215,10 +215,21 @@ function RetroTV({ audioRef }) {
               onChange={e => { const v = videoRef.current; if (v) v.volume = e.target.value; }} />
           </label>
         </div>
-        <p className="now">{tvOn && ch ? ch.title || 'Live Broadcast' : ''}</p>
+
+        {/* Currently playing with logo */}
+        <div className="now-bar">
+          {tvOn && ch && (
+            <div className="now-content">
+              {ch.logo && (
+                <img src={ch.logo} alt="" className="now-logo" onError={e => { e.currentTarget.style.display = 'none'; }} />
+              )}
+              <span className="now-text">{ch.title || ch.name}</span>
+            </div>
+          )}
+        </div>
       </section>
 
-      {/* ── Right: Channel guide ── */}
+      {/* ── Right: Channel guide with Logos ── */}
       <section className="guide" aria-label="Channel guide">
         <h2>Channel guide</h2>
         <ul>
@@ -230,6 +241,9 @@ function RetroTV({ audioRef }) {
                 <button aria-current={isCur}
                   onClick={() => { setTvOn(true); setTvIdx(realIdx); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
                   <span className="num">{c.ch}</span>
+                  <div className="guide-logo-box">
+                    <img src={c.logo} alt="" className="guide-logo" onError={e => { e.currentTarget.style.display = 'none'; }} />
+                  </div>
                   <span>
                     <span className="nm">{c.name}</span>
                     <span className="in">{c.title || 'Live'}</span>
@@ -327,6 +341,18 @@ function VintageRadio({ audioRef }) {
       });
   }, [audioRef, volume]);
 
+  const handleNextStation = () => {
+    const nextIdx = (rIdx + 1) % radioStations.length;
+    setRIdx(nextIdx);
+    playStation(nextIdx);
+  };
+
+  const handlePrevStation = () => {
+    const prevIdx = (rIdx - 1 + radioStations.length) % radioStations.length;
+    setRIdx(prevIdx);
+    playStation(prevIdx);
+  };
+
   /* Audio events */
   useEffect(() => {
     const a = audioRef.current;
@@ -348,17 +374,34 @@ function VintageRadio({ audioRef }) {
 
   return (
     <div className="radio-page">
+      {/* ── Left: Vintage Radio Receiver ── */}
       <section className="radio" aria-label="Radio">
         <div className="grille" aria-hidden="true" />
 
         <div className="lcd">
           <div className="top">
             <span>{station?.genre || ''}</span>
-            <span role="status" aria-live="polite">{rStatus}</span>
+            <span role="status" aria-live="polite" className={`rstatus-badge ${rPlaying && rStatus === 'On air' ? 'live' : ''}`}>{rStatus}</span>
           </div>
-          <div className="freq">{station?.frequency || ''}</div>
-          <div className="name">{station?.name || ''}</div>
-          <div className="desc">{station?.region || ''}</div>
+
+          <div className="lcd-main">
+            <div className="lcd-info">
+              <div className="freq">{station?.frequency || ''}</div>
+              <div className="name">{station?.name || ''}</div>
+              <div className="desc">{station?.region || ''}</div>
+            </div>
+            {station?.logo && (
+              <div className="lcd-logo-box">
+                <img
+                  src={station.logo}
+                  alt={station.name}
+                  className="lcd-logo"
+                  onError={e => { e.currentTarget.style.display = 'none'; }}
+                />
+              </div>
+            )}
+          </div>
+
           <div className="eq" aria-hidden="true">
             {eqH.map((h, i) => <i key={i} style={{ height: `${h}%` }} />)}
           </div>
@@ -368,40 +411,76 @@ function VintageRadio({ audioRef }) {
           <div className="needle" style={{ left: `${needlePct}%` }} />
         </div>
 
-        {/* Region filter */}
-        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-          {RADIO_REGIONS.map(r => (
-            <button key={r} className="chip" aria-pressed={region === r}
-              onClick={() => setRegion(r)}
-              style={{ fontSize: 11, padding: '3px 10px' }}>
-              {r}
-            </button>
-          ))}
-        </div>
-
-        {/* Station presets */}
+        {/* Station presets chips */}
         <div className="presets">
-          {filtered.map(s => {
+          {radioStations.slice(0, 8).map(s => {
             const realIdx = radioStations.indexOf(s);
             return (
               <button key={s.id} className="chip" aria-pressed={realIdx === rIdx}
                 onClick={() => { setRIdx(realIdx); playStation(realIdx); }}>
-                {s.frequency} {s.name}
+                {s.frequency.split(' ')[0]} {s.name.split(' ')[0]}
               </button>
             );
           })}
         </div>
 
-        {/* Play knob + volume */}
+        {/* Controls: Prev, Play/Pause, Next, Volume */}
         <div className="ctrl">
+          <button className="knob rknob" onClick={handlePrevStation} aria-label="Previous station" title="Previous station">
+            ◀ Stn
+          </button>
           <button className="knob play" aria-label={rPlaying ? 'Pause radio' : 'Play radio'}
-            onClick={() => rPlaying ? stopRadio() : playStation(rIdx)}>
+            onClick={() => rPlaying ? stopRadio() : playStation(rIdx)} title={rPlaying ? 'Pause' : 'Play'}>
             {rPlaying && rStatus === 'On air' ? '❚❚' : '▶'}
           </button>
-          <input type="range" min="0" max="1" step="0.01" value={volume}
-            aria-label="Radio volume"
-            onChange={e => setVolume(parseFloat(e.target.value))} />
+          <button className="knob rknob" onClick={handleNextStation} aria-label="Next station" title="Next station">
+            Stn ▶
+          </button>
+          <div className="rvol-wrap">
+            <span className="vol-lbl">Vol</span>
+            <input type="range" min="0" max="1" step="0.01" value={volume}
+              aria-label="Radio volume"
+              onChange={e => setVolume(parseFloat(e.target.value))} />
+          </div>
         </div>
+      </section>
+
+      {/* ── Right: Radio Station Guide with Logos ── */}
+      <section className="guide" aria-label="Radio station guide">
+        <h2>Radio guide</h2>
+
+        {/* Region filter chips */}
+        <div className="chips radio-filter-chips">
+          {RADIO_REGIONS.map(r => (
+            <button key={r} className="chip" aria-pressed={region === r}
+              onClick={() => setRegion(r)}>
+              {r}
+            </button>
+          ))}
+        </div>
+
+        <ul>
+          {filtered.map(s => {
+            const realIdx = radioStations.indexOf(s);
+            const isCur   = realIdx === rIdx;
+            return (
+              <li key={s.id}>
+                <button aria-current={isCur}
+                  onClick={() => { setRIdx(realIdx); playStation(realIdx); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
+                  <span className="num">{s.frequency.split(' ')[0]}</span>
+                  <div className="guide-logo-box">
+                    <img src={s.logo} alt="" className="guide-logo" onError={e => { e.currentTarget.style.display = 'none'; }} />
+                  </div>
+                  <span>
+                    <span className="nm">{s.name}</span>
+                    <span className="in">{s.genre} · {s.region}</span>
+                  </span>
+                  <span className="live">{isCur ? (rPlaying && rStatus === 'On air' ? '● On Air' : '●') : ''}</span>
+                </button>
+              </li>
+            );
+          })}
+        </ul>
       </section>
     </div>
   );
