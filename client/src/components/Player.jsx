@@ -8,28 +8,47 @@ export default function Player({ channel, onClose, onNext, onPrev }) {
   const [error, setError] = useState(null);
   const [isBuffering, setIsBuffering] = useState(true);
   const [showDebug, setShowDebug] = useState(false);
-  const [activeYoutubeId, setActiveYoutubeId] = useState(channel?.youtubeId || null);
+  // When channel has a handle, start null so we don't flash a stale/private video ID
+  const [activeYoutubeId, setActiveYoutubeId] = useState(
+    channel?.handle ? null : (channel?.youtubeId || null)
+  );
+  const [isResolvingId, setIsResolvingId] = useState(!!(channel?.handle));
 
-  const isYouTube = !!(activeYoutubeId || channel?.handle || channel?.youtubeId);
+  const isYouTube = !!(channel?.handle || channel?.youtubeId);
   const streamUrl = channel?.hls || channel?.sources?.[0]?.url;
 
   // Resolve dynamic live ID for YouTube channels so they never expire or show private
   useEffect(() => {
     let isCancelled = false;
-    setActiveYoutubeId(channel?.youtubeId || null);
 
     if (channel?.handle) {
+      // Always fetch fresh ID; don't use the stale fallback youtubeId
+      setActiveYoutubeId(null);
+      setIsResolvingId(true);
       fetch(`/api/live-id?channel=${encodeURIComponent(channel.handle)}`)
         .then(r => r.json())
         .then(data => {
-          if (!isCancelled && data?.videoId) {
-            console.log(`Live ID resolved for ${channel.handle}:`, data.videoId);
-            setActiveYoutubeId(data.videoId);
+          if (!isCancelled) {
+            if (data?.videoId) {
+              console.log(`Live ID resolved for ${channel.handle}:`, data.videoId);
+              setActiveYoutubeId(data.videoId);
+            } else {
+              // Fallback to hardcoded youtubeId if resolver returns nothing
+              setActiveYoutubeId(channel?.youtubeId || null);
+            }
+            setIsResolvingId(false);
           }
         })
         .catch(err => {
           console.warn("Dynamic live-id fetch fallback:", err);
+          if (!isCancelled) {
+            setActiveYoutubeId(channel?.youtubeId || null);
+            setIsResolvingId(false);
+          }
         });
+    } else {
+      setActiveYoutubeId(channel?.youtubeId || null);
+      setIsResolvingId(false);
     }
 
     return () => {
@@ -115,7 +134,8 @@ export default function Player({ channel, onClose, onNext, onPrev }) {
 
   if (!channel) return null;
 
-  const currentYtId = activeYoutubeId || channel.youtubeId;
+  const currentYtId = activeYoutubeId;
+  const showYouTubeLoader = isYouTube && isResolvingId && !currentYtId;
 
   return (
     <div className="relative w-full bg-black rounded-2xl overflow-hidden shadow-2xl border border-white/10 mb-4 group">
@@ -206,7 +226,13 @@ export default function Player({ channel, onClose, onNext, onPrev }) {
         )}
 
         {/* YouTube or HLS video player */}
-        {isYouTube && currentYtId ? (
+        {showYouTubeLoader ? (
+          /* Live ID resolving — show tuning spinner to avoid flash of "private video" */
+          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-black">
+            <Loader2 className="w-8 h-8 text-red-600 animate-spin mb-2" />
+            <p className="text-zinc-500 text-xs">Tuning in...</p>
+          </div>
+        ) : isYouTube && currentYtId ? (
           <iframe
             key={currentYtId}
             src={`https://www.youtube-nocookie.com/embed/${currentYtId}?autoplay=1&playsinline=1&rel=0&modestbranding=1`}
