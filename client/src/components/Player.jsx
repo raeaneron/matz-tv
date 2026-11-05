@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { X, AlertCircle, Loader2, Info, ExternalLink } from 'lucide-react';
+import { X, AlertCircle, Loader2, Info, ExternalLink, RefreshCw } from 'lucide-react';
 import Hls from 'hls.js';
 
 export default function Player({ channel, onClose, onNext, onPrev }) {
@@ -8,11 +8,36 @@ export default function Player({ channel, onClose, onNext, onPrev }) {
   const [error, setError] = useState(null);
   const [isBuffering, setIsBuffering] = useState(true);
   const [showDebug, setShowDebug] = useState(false);
+  const [activeYoutubeId, setActiveYoutubeId] = useState(channel?.youtubeId || null);
 
-  const isYouTube = !!channel?.youtubeId;
-  const isHls = !isYouTube && !!(channel?.hls || channel?.sources?.[0]?.url);
+  const isYouTube = !!(activeYoutubeId || channel?.handle || channel?.youtubeId);
   const streamUrl = channel?.hls || channel?.sources?.[0]?.url;
 
+  // Resolve dynamic live ID for YouTube channels so they never expire or show private
+  useEffect(() => {
+    let isCancelled = false;
+    setActiveYoutubeId(channel?.youtubeId || null);
+
+    if (channel?.handle) {
+      fetch(`/api/live-id?channel=${encodeURIComponent(channel.handle)}`)
+        .then(r => r.json())
+        .then(data => {
+          if (!isCancelled && data?.videoId) {
+            console.log(`Live ID resolved for ${channel.handle}:`, data.videoId);
+            setActiveYoutubeId(data.videoId);
+          }
+        })
+        .catch(err => {
+          console.warn("Dynamic live-id fetch fallback:", err);
+        });
+    }
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [channel]);
+
+  // Handle HLS stream playback
   useEffect(() => {
     if (!channel) return;
     setError(null);
@@ -31,15 +56,15 @@ export default function Player({ channel, onClose, onNext, onPrev }) {
         try { playerRef.current.destroy(); } catch (e) {}
         playerRef.current = null;
       }
-      video.removeAttribute('src');
-      video.load();
+      if (video) {
+        video.removeAttribute('src');
+        video.load();
+      }
     };
 
     cleanup();
-
     video.playsInline = true;
 
-    // HLS.js for Chrome, Edge, Firefox, Android
     if (Hls.isSupported()) {
       const hls = new Hls({
         enableWorker: true,
@@ -58,7 +83,6 @@ export default function Player({ channel, onClose, onNext, onPrev }) {
       hls.on(Hls.Events.ERROR, (_event, data) => {
         if (data.fatal) {
           console.error("HLS fatal error:", data);
-          // If direct HLS failed, try through proxy
           if (!streamUrl.includes('/api/proxy')) {
             const proxied = `/api/proxy?url=${encodeURIComponent(streamUrl)}`;
             hls.loadSource(proxied);
@@ -71,7 +95,6 @@ export default function Player({ channel, onClose, onNext, onPrev }) {
       return cleanup;
     }
 
-    // Native HLS for Safari / iOS
     if (video.canPlayType('application/vnd.apple.mpegurl')) {
       video.src = streamUrl;
       video.addEventListener('loadedmetadata', () => {
@@ -88,19 +111,21 @@ export default function Player({ channel, onClose, onNext, onPrev }) {
     setError("Browser does not support HLS streaming.");
     setIsBuffering(false);
     return cleanup;
-  }, [channel]);
+  }, [channel, activeYoutubeId]);
 
   if (!channel) return null;
+
+  const currentYtId = activeYoutubeId || channel.youtubeId;
 
   return (
     <div className="relative w-full bg-black rounded-2xl overflow-hidden shadow-2xl border border-white/10 mb-4 group">
       {/* On-Screen Display (OSD) Header */}
-      <div className="absolute top-0 left-0 right-0 z-30 flex items-center justify-between p-3.5 bg-gradient-to-b from-black/90 via-black/40 to-transparent transition-opacity group-hover:opacity-100 opacity-70">
+      <div className="absolute top-0 left-0 right-0 z-30 flex items-center justify-between p-3.5 bg-gradient-to-b from-black/90 via-black/40 to-transparent transition-opacity group-hover:opacity-100 opacity-75">
         <div className="flex items-center gap-2.5">
           <span className="px-2 py-0.5 bg-red-600 text-white font-black rounded text-[10px] tracking-wider shadow">
             CH {channel.ch || 'LIVE'}
           </span>
-          <span className="text-white font-black text-sm truncate max-w-[240px] drop-shadow">
+          <span className="text-white font-black text-sm truncate max-w-[200px] sm:max-w-[320px] drop-shadow">
             {channel.name}
           </span>
           <button
@@ -113,13 +138,13 @@ export default function Player({ channel, onClose, onNext, onPrev }) {
         </div>
 
         <div className="flex items-center gap-2">
-          {isYouTube && (
+          {currentYtId && (
             <a
-              href={`https://www.youtube.com/watch?v=${channel.youtubeId}`}
+              href={`https://www.youtube.com/watch?v=${currentYtId}`}
               target="_blank"
               rel="noreferrer"
               className="flex items-center gap-1 px-2.5 py-1 bg-white/10 hover:bg-red-600 rounded-lg text-[10px] font-bold text-white transition"
-              title="Open stream on YouTube"
+              title="Watch on YouTube"
             >
               <ExternalLink size={12} />
               <span className="hidden sm:inline">YouTube</span>
@@ -174,16 +199,17 @@ export default function Player({ channel, onClose, onNext, onPrev }) {
         {showDebug && (
           <div className="absolute bottom-16 left-4 right-4 z-40 bg-black/85 p-3 rounded-lg text-[10px] font-mono text-green-400 break-all border border-green-500/20 max-h-[110px] overflow-auto pointer-events-none">
             CHANNEL: CH {channel.ch} - {channel.name}<br/>
-            TYPE: {isYouTube ? 'YouTube Live ID' : 'HLS Direct'}<br/>
-            SOURCE: {channel.youtubeId || streamUrl}
+            YT_ID: {currentYtId || 'None'}<br/>
+            HANDLE: {channel.handle || 'None'}<br/>
+            HLS: {streamUrl || 'None'}
           </div>
         )}
 
-        {/* Video / YouTube Playback */}
-        {isYouTube ? (
+        {/* YouTube or HLS video player */}
+        {isYouTube && currentYtId ? (
           <iframe
-            key={channel.youtubeId}
-            src={`https://www.youtube-nocookie.com/embed/${channel.youtubeId}?autoplay=1&playsinline=1&rel=0&modestbranding=1`}
+            key={currentYtId}
+            src={`https://www.youtube-nocookie.com/embed/${currentYtId}?autoplay=1&playsinline=1&rel=0&modestbranding=1`}
             className="w-full h-full border-0"
             referrerPolicy="strict-origin-when-cross-origin"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -205,11 +231,11 @@ export default function Player({ channel, onClose, onNext, onPrev }) {
 
       {/* PinasDex Remote Control Bar */}
       <div className="bg-[#0f0f0f] border-t border-white/5 px-4 py-2.5 flex items-center justify-between gap-3 flex-wrap">
-        <div className="flex items-center gap-3 overflow-hidden">
-          <div className="w-8 h-8 rounded-lg bg-zinc-800 border border-white/10 flex items-center justify-center flex-shrink-0 overflow-hidden p-1">
-            <img src={channel.logo} alt="" className="w-full h-full object-contain" />
+        <div className="flex items-center gap-3 overflow-hidden min-w-0">
+          <div className="w-8 h-8 rounded-lg bg-zinc-800 border border-white/10 flex items-center justify-center flex-shrink-0 overflow-hidden p-0.5">
+            <img src={channel.logo} alt="" className="w-full h-full object-cover rounded" />
           </div>
-          <div className="overflow-hidden">
+          <div className="overflow-hidden min-w-0">
             <div className="flex items-center gap-2">
               <span className="text-xs font-black text-white">CH {channel.ch}</span>
               <span className="text-xs font-bold text-zinc-300 truncate">{channel.name}</span>
@@ -219,7 +245,7 @@ export default function Player({ channel, onClose, onNext, onPrev }) {
         </div>
 
         {/* Flipping Buttons */}
-        <div className="flex items-center gap-1.5 ml-auto">
+        <div className="flex items-center gap-1.5 ml-auto flex-shrink-0">
           {onPrev && (
             <button
               onClick={onPrev}
