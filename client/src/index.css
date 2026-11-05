@@ -74,9 +74,11 @@ h1 {
   border-bottom: 2px solid rgba(0, 0, 0, 0.08);
   padding-bottom: 14px;
 }
-:root[data-theme="dark"] .tab-nav,
+:root[data-theme="dark"] .tab-nav {
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
 @media (prefers-color-scheme: dark) {
-  .tab-nav {
+  :root:not([data-theme="light"]) .tab-nav {
     border-bottom-color: rgba(255, 255, 255, 0.08);
   }
 }
