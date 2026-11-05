@@ -7,7 +7,7 @@ export const radioStations = [
     region: "Metro Manila",
     genre: "News / Public Affairs",
     url: "https://azura.dzrh.com.ph/listen/dzrh_manila/radio.mp3",
-    logo: "https://placehold.co/80x80/b91c1c/ffffff?text=DZRH"
+    logo: "https://pinasdex.com/media/live/41-870dbaff.png"
   },
   {
     id: 2,
@@ -43,7 +43,7 @@ export const radioStations = [
     region: "Metro Manila",
     genre: "News / Talk / Sports",
     url: "https://radio.tv5.com.ph/truefm/audio.stream/playlist.m3u8",
-    logo: "https://placehold.co/80x80/dc2626/ffffff?text=TRUE"
+    logo: "https://pinasdex.com/media/live/05-c411970c.png"
   },
   {
     id: 6,
@@ -150,7 +150,7 @@ export const radioStations = [
     region: "International",
     genre: "Global News / Analysis",
     url: "https://stream.live.vc.bbcmedia.co.uk/bbc_world_service",
-    logo: "https://placehold.co/80x80/991b1b/ffffff?text=BBC"
+    logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/eb/BBC_World_Service_red.svg/320px-BBC_World_Service_red.svg.png"
   },
   {
     id: 17,
@@ -159,7 +159,7 @@ export const radioStations = [
     region: "International",
     genre: "International News",
     url: "https://live02.rfi.fr/rfianglais-128.mp3",
-    logo: "https://placehold.co/80x80/0284c7/ffffff?text=RFI"
+    logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/RFI_logo_2013.svg/320px-RFI_logo_2013.svg.png"
   },
   {
     id: 18,
@@ -168,6 +168,6 @@ export const radioStations = [
     region: "International",
     genre: "News / Documentaries",
     url: "https://voa-ingest.akamaized.net/hls/live/2035144/VOAENG/master.m3u8",
-    logo: "https://placehold.co/80x80/1e40af/ffffff?text=VOA"
+    logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Voice_of_America_logo.svg/320px-Voice_of_America_logo.svg.png"
   }
 ];
