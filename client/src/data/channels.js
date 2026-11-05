@@ -9,7 +9,7 @@ export const channels = [
     youtubeId: "xS_VcSS9Cjw",
     handle: "@abscbnentertainment",
     hls: "",
-    logo: "https://placehold.co/300x170/1e3a8a/ffffff?text=Kapamilya",
+    logo: "https://pinasdex.com/media/live/02-40052e4f.png",
     sources: [
       { name: "Live Stream", url: "https://www.youtube-nocookie.com/embed/xS_VcSS9Cjw", type: "youtube", index: 0 }
     ]
@@ -23,7 +23,7 @@ export const channels = [
     youtubeId: "W3l8jB0t_0I",
     handle: "@gmanews",
     hls: "",
-    logo: "https://placehold.co/300x170/065f46/ffffff?text=GMA+News",
+    logo: "https://pinasdex.com/media/live/15-ea1a397f.png",
     sources: [
       { name: "Live Stream", url: "https://www.youtube-nocookie.com/embed/W3l8jB0t_0I", type: "youtube", index: 0 }
     ]
@@ -37,7 +37,7 @@ export const channels = [
     youtubeId: "OkBXqDc4Ak8",
     handle: "@gmanetwork",
     hls: "",
-    logo: "https://placehold.co/300x170/047857/ffffff?text=GMA+7",
+    logo: "https://pinasdex.com/media/live/07-39d9fec4.png",
     sources: [
       { name: "Live Stream", url: "https://www.youtube-nocookie.com/embed/OkBXqDc4Ak8", type: "youtube", index: 0 }
     ]
@@ -51,7 +51,7 @@ export const channels = [
     youtubeId: "F7LPbO2nQRk",
     handle: "@UNTVNewsandRescue",
     hls: "",
-    logo: "https://placehold.co/300x170/0f172a/f59e0b?text=UNTV",
+    logo: "https://pinasdex.com/media/live/37-f88bbe0c.png",
     sources: [
       { name: "Live Stream", url: "https://www.youtube-nocookie.com/embed/F7LPbO2nQRk", type: "youtube", index: 0 }
     ]
@@ -65,7 +65,7 @@ export const channels = [
     youtubeId: "VzS75VuvLxs",
     handle: "@dzrhnews",
     hls: "",
-    logo: "https://placehold.co/300x170/b91c1c/ffffff?text=DZRH+TV",
+    logo: "https://pinasdex.com/media/live/41-870dbaff.png",
     sources: [
       { name: "Live Stream", url: "https://www.youtube-nocookie.com/embed/VzS75VuvLxs", type: "youtube", index: 0 }
     ]
@@ -78,7 +78,7 @@ export const channels = [
     title: "Abante TeleTabloid Live Feed",
     youtubeId: "",
     hls: "https://amg19223-amg19223c12-amgplt0352.playout.now3.amagi.tv/playlist/amg19223-amg19223c12-amgplt0352/playlist.m3u8",
-    logo: "https://placehold.co/300x170/dc2626/ffffff?text=Abante+TV",
+    logo: "https://pinasdex.com/media/live/50-46c3bd29.png",
     sources: [
       { name: "Server 1", url: "https://amg19223-amg19223c12-amgplt0352.playout.now3.amagi.tv/playlist/amg19223-amg19223c12-amgplt0352/playlist.m3u8", type: "hls", index: 0 }
     ]
@@ -158,7 +158,7 @@ export const channels = [
     title: "BBC News International HD",
     youtubeId: "",
     hls: "https://vs-hls-push-ww-live.akamaized.net/x=4/i=urn:bbc:pips:service:bbc_news_channel_hd/t=3840/v=pv14/b=5070016/main.m3u8",
-    logo: "https://placehold.co/300x170/991b1b/ffffff?text=BBC+World",
+    logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/62/BBC_News_2022.svg/320px-BBC_News_2022.svg.png",
     sources: [
       { name: "Server 1", url: "https://vs-hls-push-ww-live.akamaized.net/x=4/i=urn:bbc:pips:service:bbc_news_channel_hd/t=3840/v=pv14/b=5070016/main.m3u8", type: "hls", index: 0 }
     ]
@@ -171,7 +171,7 @@ export const channels = [
     title: "BBC News Asia Pacific Service",
     youtubeId: "",
     hls: "https://cdn4.skygo.mn/live/disk1/BBC_News/HLSv3-FTA/BBC_News.m3u8",
-    logo: "https://placehold.co/300x170/991b1b/ffffff?text=BBC+Asia",
+    logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/62/BBC_News_2022.svg/320px-BBC_News_2022.svg.png",
     sources: [
       { name: "Server 1", url: "https://cdn4.skygo.mn/live/disk1/BBC_News/HLSv3-FTA/BBC_News.m3u8", type: "hls", index: 0 }
     ]
@@ -184,7 +184,7 @@ export const channels = [
     title: "CNN Live HD Stream",
     youtubeId: "",
     hls: "https://turnerlive.warnermediacdn.com/hls/live/586495/cnngo/cnn_slate/VIDEO_0_3564000.m3u8",
-    logo: "https://placehold.co/300x170/dc2626/ffffff?text=CNN",
+    logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/CNN.svg/320px-CNN.svg.png",
     sources: [
       { name: "Server 1", url: "https://turnerlive.warnermediacdn.com/hls/live/586495/cnngo/cnn_slate/VIDEO_0_3564000.m3u8", type: "hls", index: 0 }
     ]
@@ -197,7 +197,7 @@ export const channels = [
     title: "Bloomberg Financial & Business News",
     youtubeId: "",
     hls: "https://www.bloomberg.com/media-manifest/streams/asia.m3u8",
-    logo: "https://placehold.co/300x170/111827/ffffff?text=Bloomberg",
+    logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/56/Bloomberg_Television_logo_2015.svg/320px-Bloomberg_Television_logo_2015.svg.png",
     sources: [
       { name: "Server 1", url: "https://www.bloomberg.com/media-manifest/streams/asia.m3u8", type: "hls", index: 0 }
     ]
@@ -210,7 +210,7 @@ export const channels = [
     title: "CGTN Global 24/7 News",
     youtubeId: "",
     hls: "https://english-livebkali.cgtn.com/live/cgtnglobal.m3u8",
-    logo: "https://placehold.co/300x170/1e3a8a/38bdf8?text=CGTN+News",
+    logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/CGTN_logo.svg/320px-CGTN_logo.svg.png",
     sources: [
       { name: "Server 1", url: "https://english-livebkali.cgtn.com/live/cgtnglobal.m3u8", type: "hls", index: 0 }
     ]
@@ -223,7 +223,7 @@ export const channels = [
     title: "CGTN Documentary Channel",
     youtubeId: "",
     hls: "https://english-livebkali.cgtn.com/live/doccgtn_1.m3u8",
-    logo: "https://placehold.co/300x170/1e3a8a/38bdf8?text=CGTN+Docs",
+    logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/CGTN_logo.svg/320px-CGTN_logo.svg.png",
     sources: [
       { name: "Server 1", url: "https://english-livebkali.cgtn.com/live/doccgtn_1.m3u8", type: "hls", index: 0 }
     ]
@@ -236,7 +236,7 @@ export const channels = [
     title: "Markets & Stock Analysis Live",
     youtubeId: "",
     hls: "https://yahoo-samsung.amagi.tv/playlist.m3u8",
-    logo: "https://placehold.co/300x170/5b21b6/ffffff?text=Yahoo+Finance",
+    logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Yahoo%21_Finance_logo_2021.svg/320px-Yahoo%21_Finance_logo_2021.svg.png",
     sources: [
       { name: "Server 1", url: "https://yahoo-samsung.amagi.tv/playlist.m3u8", type: "hls", index: 0 }
     ]
@@ -251,7 +251,7 @@ export const channels = [
     title: "Live Football, Tennis & Motorsport",
     youtubeId: "",
     hls: "https://amg01334-beinsportsllc-beinxtra-localnow-kcy6r.amagi.tv/playlist.m3u8",
-    logo: "https://placehold.co/300x170/6b21a8/ffffff?text=BeIN+Sports",
+    logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Bein_sports_logo.svg/320px-Bein_sports_logo.svg.png",
     sources: [
       { name: "Server 1", url: "https://amg01334-beinsportsllc-beinxtra-localnow-kcy6r.amagi.tv/playlist.m3u8", type: "hls", index: 0 }
     ]
