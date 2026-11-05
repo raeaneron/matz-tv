@@ -34,12 +34,12 @@ export const channels = [
     name: "Kapuso Stream (GMA 7)",
     category: "PH LOCAL",
     title: "GMA Network | Kapuso Stream Teleseryes & Shows",
-    youtubeId: "dne-YGOEFVc",
+    youtubeId: "OkBXqDc4Ak8",
     handle: "@gmanetwork",
     hls: "",
     logo: "https://placehold.co/300x170/047857/ffffff?text=GMA+7",
     sources: [
-      { name: "Live Stream", url: "https://www.youtube-nocookie.com/embed/dne-YGOEFVc", type: "youtube", index: 0 }
+      { name: "Live Stream", url: "https://www.youtube-nocookie.com/embed/OkBXqDc4Ak8", type: "youtube", index: 0 }
     ]
   },
   {
@@ -62,12 +62,12 @@ export const channels = [
     name: "DZRH TV",
     category: "PH LOCAL",
     title: "DZRH News Television | Breaking News & Updates",
-    youtubeId: "D9I6RTgFiW4",
+    youtubeId: "VzS75VuvLxs",
     handle: "@dzrhnews",
     hls: "",
     logo: "https://placehold.co/300x170/b91c1c/ffffff?text=DZRH+TV",
     sources: [
-      { name: "Live Stream", url: "https://www.youtube-nocookie.com/embed/D9I6RTgFiW4", type: "youtube", index: 0 }
+      { name: "Live Stream", url: "https://www.youtube-nocookie.com/embed/VzS75VuvLxs", type: "youtube", index: 0 }
     ]
   },
   {
