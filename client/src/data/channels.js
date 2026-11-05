@@ -1,5 +1,5 @@
 export const channels = [
-  // ── PH LOCAL ──
+  // ── PH LOCAL (PinasDex Lineup) ──
   {
     id: 1,
     ch: "02",
@@ -7,53 +7,71 @@ export const channels = [
     category: "PH LOCAL",
     title: "ABS-CBN Entertainment | 24/7 Live Stream",
     youtubeId: "xS_VcSS9Cjw",
+    handle: "@abscbnentertainment",
     hls: "",
     logo: "https://placehold.co/300x170/1e3a8a/ffffff?text=Kapamilya",
     sources: [
-      { name: "Live Feed", url: "https://www.youtube-nocookie.com/embed/xS_VcSS9Cjw?autoplay=1&playsinline=1", type: "youtube", index: 0 }
+      { name: "Live Stream", url: "https://www.youtube-nocookie.com/embed/xS_VcSS9Cjw", type: "youtube", index: 0 }
     ]
   },
   {
     id: 2,
     ch: "07",
-    name: "Kapuso Stream (GMA)",
+    name: "GMA Integrated News",
     category: "PH LOCAL",
-    title: "GMA Network | Kapuso Stream Livestream",
-    youtubeId: "OkBXqDc4Ak8",
+    title: "GMA Integrated News | 24 Oras, Saksi, Live Bulletins",
+    youtubeId: "W3l8jB0t_0I",
+    handle: "@gmanews",
     hls: "",
-    logo: "https://placehold.co/300x170/065f46/ffffff?text=GMA+7",
+    logo: "https://placehold.co/300x170/065f46/ffffff?text=GMA+News",
     sources: [
-      { name: "Live Feed", url: "https://www.youtube-nocookie.com/embed/OkBXqDc4Ak8?autoplay=1&playsinline=1", type: "youtube", index: 0 }
+      { name: "Live Stream", url: "https://www.youtube-nocookie.com/embed/W3l8jB0t_0I", type: "youtube", index: 0 }
     ]
   },
   {
     id: 3,
+    ch: "08",
+    name: "Kapuso Stream (GMA 7)",
+    category: "PH LOCAL",
+    title: "GMA Network | Kapuso Stream Teleseryes & Shows",
+    youtubeId: "dne-YGOEFVc",
+    handle: "@gmanetwork",
+    hls: "",
+    logo: "https://placehold.co/300x170/047857/ffffff?text=GMA+7",
+    sources: [
+      { name: "Live Stream", url: "https://www.youtube-nocookie.com/embed/dne-YGOEFVc", type: "youtube", index: 0 }
+    ]
+  },
+  {
+    id: 4,
     ch: "37",
     name: "UNTV News & Rescue",
     category: "PH LOCAL",
     title: "UNTV Public Service & News Live Broadcast",
     youtubeId: "F7LPbO2nQRk",
+    handle: "@UNTVNewsandRescue",
     hls: "",
     logo: "https://placehold.co/300x170/0f172a/f59e0b?text=UNTV",
     sources: [
-      { name: "Live Feed", url: "https://www.youtube-nocookie.com/embed/F7LPbO2nQRk?autoplay=1&playsinline=1", type: "youtube", index: 0 }
-    ]
-  },
-  {
-    id: 4,
-    ch: "41",
-    name: "DZRH TV",
-    category: "PH LOCAL",
-    title: "DZRH News Television | Breaking News & Live Updates",
-    youtubeId: "VzS75VuvLxs",
-    hls: "",
-    logo: "https://placehold.co/300x170/b91c1c/ffffff?text=DZRH+TV",
-    sources: [
-      { name: "Live Feed", url: "https://www.youtube-nocookie.com/embed/VzS75VuvLxs?autoplay=1&playsinline=1", type: "youtube", index: 0 }
+      { name: "Live Stream", url: "https://www.youtube-nocookie.com/embed/F7LPbO2nQRk", type: "youtube", index: 0 }
     ]
   },
   {
     id: 5,
+    ch: "41",
+    name: "DZRH TV",
+    category: "PH LOCAL",
+    title: "DZRH News Television | Breaking News & Updates",
+    youtubeId: "D9I6RTgFiW4",
+    handle: "@dzrhnews",
+    hls: "",
+    logo: "https://placehold.co/300x170/b91c1c/ffffff?text=DZRH+TV",
+    sources: [
+      { name: "Live Stream", url: "https://www.youtube-nocookie.com/embed/D9I6RTgFiW4", type: "youtube", index: 0 }
+    ]
+  },
+  {
+    id: 6,
     ch: "50",
     name: "Abante TV",
     category: "PH LOCAL",
@@ -66,7 +84,7 @@ export const channels = [
     ]
   },
   {
-    id: 6,
+    id: 7,
     ch: "51",
     name: "INC TV",
     category: "PH LOCAL",
@@ -79,7 +97,7 @@ export const channels = [
     ]
   },
   {
-    id: 7,
+    id: 8,
     ch: "56",
     name: "Hope Channel Philippines",
     category: "PH LOCAL",
@@ -89,19 +107,6 @@ export const channels = [
     logo: "https://placehold.co/300x170/0284c7/ffffff?text=Hope+Ch",
     sources: [
       { name: "Server 1", url: "https://jstre.am/live/jsl:nX5eC7gQvZb.m3u8", type: "hls", index: 0 }
-    ]
-  },
-  {
-    id: 8,
-    ch: "08",
-    name: "TFC GUAM",
-    category: "PH LOCAL",
-    title: "The Filipino Channel - ABS-CBN Global",
-    youtubeId: "",
-    hls: "https://tfcguam-abscbn-ono.amagi.tv/index.m3u8",
-    logo: "https://placehold.co/300x170/1a1a2e/e94560?text=TFC+GUAM",
-    sources: [
-      { name: "Server 1", url: "https://tfcguam-abscbn-ono.amagi.tv/index.m3u8", type: "hls", index: 0 }
     ]
   },
   {
@@ -120,6 +125,19 @@ export const channels = [
   {
     id: 10,
     ch: "10",
+    name: "TFC GUAM",
+    category: "PH LOCAL",
+    title: "The Filipino Channel - ABS-CBN Global",
+    youtubeId: "",
+    hls: "https://tfcguam-abscbn-ono.amagi.tv/index.m3u8",
+    logo: "https://placehold.co/300x170/1a1a2e/e94560?text=TFC+GUAM",
+    sources: [
+      { name: "Server 1", url: "https://tfcguam-abscbn-ono.amagi.tv/index.m3u8", type: "hls", index: 0 }
+    ]
+  },
+  {
+    id: 11,
+    ch: "11",
     name: "CLTV 36",
     category: "PH LOCAL",
     title: "Central Luzon Television Live",
@@ -133,8 +151,8 @@ export const channels = [
 
   // ── NEWS ──
   {
-    id: 11,
-    ch: "11",
+    id: 12,
+    ch: "12",
     name: "BBC World News",
     category: "NEWS",
     title: "BBC News International HD",
@@ -146,8 +164,8 @@ export const channels = [
     ]
   },
   {
-    id: 12,
-    ch: "12",
+    id: 13,
+    ch: "13",
     name: "BBC News Asia Pacific",
     category: "NEWS",
     title: "BBC News Asia Pacific Service",
@@ -159,8 +177,8 @@ export const channels = [
     ]
   },
   {
-    id: 13,
-    ch: "13",
+    id: 14,
+    ch: "14",
     name: "CNN",
     category: "NEWS",
     title: "CNN Live HD Stream",
@@ -172,8 +190,8 @@ export const channels = [
     ]
   },
   {
-    id: 14,
-    ch: "14",
+    id: 15,
+    ch: "15",
     name: "Bloomberg Asia",
     category: "NEWS",
     title: "Bloomberg Financial & Business News",
@@ -185,8 +203,8 @@ export const channels = [
     ]
   },
   {
-    id: 15,
-    ch: "15",
+    id: 16,
+    ch: "16",
     name: "CGTN News Live",
     category: "NEWS",
     title: "CGTN Global 24/7 News",
@@ -198,8 +216,8 @@ export const channels = [
     ]
   },
   {
-    id: 16,
-    ch: "16",
+    id: 17,
+    ch: "17",
     name: "CGTN Documentaries",
     category: "NEWS",
     title: "CGTN Documentary Channel",
@@ -211,8 +229,8 @@ export const channels = [
     ]
   },
   {
-    id: 17,
-    ch: "17",
+    id: 18,
+    ch: "18",
     name: "Yahoo! Finance",
     category: "NEWS",
     title: "Markets & Stock Analysis Live",
@@ -226,8 +244,8 @@ export const channels = [
 
   // ── SPORTS ──
   {
-    id: 18,
-    ch: "18",
+    id: 19,
+    ch: "19",
     name: "BeIN Sports Xtra",
     category: "SPORTS",
     title: "Live Football, Tennis & Motorsport",
@@ -239,8 +257,8 @@ export const channels = [
     ]
   },
   {
-    id: 19,
-    ch: "19",
+    id: 20,
+    ch: "20",
     name: "Outdoor Channel",
     category: "SPORTS",
     title: "Hunting, Fishing & Outdoor Action",
@@ -254,8 +272,8 @@ export const channels = [
 
   // ── KIDS ──
   {
-    id: 20,
-    ch: "20",
+    id: 21,
+    ch: "21",
     name: "Moonbug Kids",
     category: "KIDS",
     title: "CoComelon, Blippi & Friends 24/7",
@@ -267,8 +285,8 @@ export const channels = [
     ]
   },
   {
-    id: 21,
-    ch: "21",
+    id: 22,
+    ch: "22",
     name: "Japanim TV",
     category: "KIDS",
     title: "Anime & Classic Animation",
@@ -280,8 +298,8 @@ export const channels = [
     ]
   },
   {
-    id: 22,
-    ch: "22",
+    id: 23,
+    ch: "23",
     name: "Persiana Junior",
     category: "KIDS",
     title: "Cartoons & Children's TV",
@@ -293,8 +311,8 @@ export const channels = [
     ]
   },
   {
-    id: 23,
-    ch: "23",
+    id: 24,
+    ch: "24",
     name: "3ABN Kids",
     category: "KIDS",
     title: "Three Angels Kids Network",
@@ -308,8 +326,8 @@ export const channels = [
 
   // ── INTERNATIONAL ──
   {
-    id: 24,
-    ch: "24",
+    id: 25,
+    ch: "25",
     name: "Thrillers (AMC)",
     category: "INTERNATIONAL",
     title: "Horror, Mystery & Suspense Movies",
@@ -321,8 +339,8 @@ export const channels = [
     ]
   },
   {
-    id: 25,
-    ch: "25",
+    id: 26,
+    ch: "26",
     name: "MovieSphere",
     category: "INTERNATIONAL",
     title: "Feature Films & Blockbusters",
@@ -334,8 +352,8 @@ export const channels = [
     ]
   },
   {
-    id: 26,
-    ch: "26",
+    id: 27,
+    ch: "27",
     name: "Arirang TV",
     category: "INTERNATIONAL",
     title: "Korea's Global TV Network",
@@ -347,8 +365,8 @@ export const channels = [
     ]
   },
   {
-    id: 27,
-    ch: "27",
+    id: 28,
+    ch: "28",
     name: "Blues TV",
     category: "INTERNATIONAL",
     title: "Music, Concerts & Blues Legends",
@@ -360,8 +378,8 @@ export const channels = [
     ]
   },
   {
-    id: 28,
-    ch: "28",
+    id: 29,
+    ch: "29",
     name: "EWTN Asia-Pacific",
     category: "INTERNATIONAL",
     title: "Global Catholic Network Asia",
@@ -373,8 +391,8 @@ export const channels = [
     ]
   },
   {
-    id: 29,
-    ch: "29",
+    id: 30,
+    ch: "30",
     name: "EWTN Europe",
     category: "INTERNATIONAL",
     title: "Global Catholic Network Europe",
