@@ -3,18 +3,16 @@ import { X, AlertCircle, Loader2, Shield, Info } from 'lucide-react';
 import Hls from 'hls.js';
 
 function detectStreamType(url, hintType) {
+  if (hintType === 'youtube') return 'youtube';
   if (!url) return hintType || 'hls';
-  
-  // Decode URL in case it is wrapped in a proxy (e.g. /api/proxy?url=...)
+  if (url.includes('youtube.com') || url.includes('youtu.be')) return 'youtube';
+
   let checkUrl = url;
   try { checkUrl = decodeURIComponent(url); } catch (e) {}
-
-  const lower = checkUrl.toLowerCase().split('?').find(part => part.includes('.m3u8') || part.includes('.mpd')) || checkUrl.toLowerCase();
-  
-  if (lower.includes('.m3u8')) return 'hls';
+  const lower = checkUrl.toLowerCase();
   if (lower.includes('.mpd')) return 'mpd';
+  if (lower.includes('.m3u8')) return 'hls';
   if (hintType && hintType.toLowerCase().includes('mpd')) return 'mpd';
-  if (hintType && hintType.toLowerCase().includes('dash')) return 'mpd';
   return hintType || 'hls';
 }
 
@@ -24,10 +22,6 @@ if (!window.globalTriedSources) {
 }
 const globalTriedSources = window.globalTriedSources;
 
-window.clearSourceCache = () => {
-  globalTriedSources.clear();
-};
-
 export default function Player({ source, channelName, onClose, availableSources, onSwitchSource }) {
   const videoRef = useRef(null);
   const playerInstanceRef = useRef(null);
@@ -36,23 +30,30 @@ export default function Player({ source, channelName, onClose, availableSources,
   const [isBuffering, setIsBuffering] = useState(true);
   const [showDebug, setShowDebug] = useState(false);
 
-  // Reset global cache if channel changes
   if (channelName !== globalLastChannelName) {
     globalTriedSources.clear();
     globalLastChannelName = channelName;
   }
 
-  useEffect(() => {
-    if (!source || !videoRef.current) return;
+  const actualType = detectStreamType(source?.url, source?.type);
 
-    const video = videoRef.current;
+  useEffect(() => {
+    if (!source) return;
+
     setError(null);
     setIsDrmError(false);
     setIsBuffering(true);
-
     globalTriedSources.add(source.name);
 
-    const actualType = detectStreamType(source.url, source.type);
+    // YouTube Stream
+    if (actualType === 'youtube') {
+      setIsBuffering(false);
+      return;
+    }
+
+    const video = videoRef.current;
+    if (!video) return;
+
     const hasDrm = !!(source.key && source.keyId);
 
     const cleanup = async () => {
@@ -62,18 +63,20 @@ export default function Player({ source, channelName, onClose, availableSources,
         }
         playerInstanceRef.current = null;
       }
-      video.removeAttribute('src');
-      video.load();
+      if (video) {
+        video.removeAttribute('src');
+        video.load();
+      }
     };
 
     const tryFallback = (errorMsg, isDrm = false) => {
       if (availableSources && availableSources.length > 1) {
-         const nextSource = availableSources.find(s => !globalTriedSources.has(s.name));
-         if (nextSource) {
-            console.log("Stream error, auto-switching to:", nextSource.name);
-            onSwitchSource(nextSource);
-            return;
-         }
+        const nextSource = availableSources.find(s => !globalTriedSources.has(s.name));
+        if (nextSource) {
+          console.log("Switching to next server:", nextSource.name);
+          onSwitchSource(nextSource);
+          return;
+        }
       }
       setIsDrmError(isDrm);
       setError(errorMsg);
@@ -82,131 +85,98 @@ export default function Player({ source, channelName, onClose, availableSources,
 
     const initPlayer = async () => {
       await cleanup();
-
-      // Install polyfills for older browsers
-      if (window.shaka) {
-        window.shaka.polyfill.installAll();
-      }
-
-      // Ensure we are playing inline (important for iOS)
       video.playsInline = true;
 
-      // STRATEGY 1: DASH or DRM Streams (Requires Shaka Player)
+      // STRATEGY 1: DASH / MPD (Shaka)
       if (actualType === 'mpd' || hasDrm) {
         if (!window.shaka || !window.shaka.Player.isBrowserSupported()) {
-          tryFallback("Your browser does not support DASH or DRM streams.");
+          tryFallback("Your browser does not support DASH streams.");
           return;
         }
 
+        window.shaka.polyfill.installAll();
         const shakaPlayer = new window.shaka.Player(video);
         playerInstanceRef.current = shakaPlayer;
 
-        // ── KEY FIX: Proxy ALL http:// segment/manifest requests through our
-        //   Netlify function so they are not blocked as mixed-content on HTTPS.
+        // Proxy all http requests to bypass mixed content
         shakaPlayer.getNetworkingEngine().registerRequestFilter((_type, request) => {
           const uri = request.uris[0];
           if (uri && uri.startsWith('http://')) {
-            const ext = uri.includes('.mpd')  ? '/stream.mpd'
-                      : uri.includes('.m3u8') ? '/stream.m3u8'
-                      : '';
-            request.uris[0] = `/api/proxy${ext}?url=${encodeURIComponent(uri)}`;
+            request.uris[0] = `/api/proxy?url=${encodeURIComponent(uri)}`;
           }
         });
 
-        // Configure Shaka for DRM if needed
         if (hasDrm) {
-          const clearKeys = { [source.keyId]: source.key };
-          shakaPlayer.configure({ drm: { clearKeys } });
+          shakaPlayer.configure({ drm: { clearKeys: { [source.keyId]: source.key } } });
         }
 
         shakaPlayer.addEventListener('error', (event) => {
-          const err = event.detail;
-          console.error("Shaka Player Error:", err);
-          if (err.code === 6007 || err.code === 6001 || err.code === 6000) {
-             tryFallback("DRM Protected: Encryption not supported here.", true);
-          } else {
-             tryFallback(`Playback Failed (Error Code: ${err.code}). Stream might be offline.`);
-          }
+          console.error("Shaka Error:", event.detail);
+          tryFallback("Stream offline or unavailable.");
         });
 
         try {
           await shakaPlayer.load(source.url);
           setIsBuffering(false);
-          video.play().catch(e => console.log("Autoplay blocked"));
+          video.play().catch(() => {});
         } catch (e) {
-          console.error("Shaka Load Error", e);
-          if (e.code === 6007 || e.code === 6001) {
-             tryFallback("DRM Protected: Encryption not supported here.", true);
-          } else {
-             tryFallback(`Failed to load stream (Code ${e.code}).`);
-          }
+          tryFallback("Failed to load stream.");
         }
         return;
       }
 
       // STRATEGY 2: HLS Streams
-      const supportsNativeHls = video.canPlayType('application/vnd.apple.mpegurl') || 
+      const supportsNativeHls = video.canPlayType('application/vnd.apple.mpegurl') ||
                                 video.canPlayType('application/x-mpegURL');
 
-      if (actualType === 'hls') {
-        // Prefer Hls.js for non-Safari browsers
-        if (Hls.isSupported() && !supportsNativeHls) {
-          const hls = new Hls({
-            enableWorker: true,
-            lowLatencyMode: true
-          });
-          playerInstanceRef.current = hls;
+      if (Hls.isSupported()) {
+        const hls = new Hls({
+          enableWorker: true,
+          lowLatencyMode: true
+        });
+        playerInstanceRef.current = hls;
 
-          hls.loadSource(source.url);
-          hls.attachMedia(video);
+        hls.loadSource(source.url);
+        hls.attachMedia(video);
 
-          hls.on(Hls.Events.MANIFEST_PARSED, () => {
-            setIsBuffering(false);
-            video.play().catch(e => console.log("Autoplay blocked"));
-          });
+        hls.on(Hls.Events.MANIFEST_PARSED, () => {
+          setIsBuffering(false);
+          video.play().catch(() => {});
+        });
 
-          hls.on(Hls.Events.ERROR, (event, data) => {
-            if (data.fatal) {
-              console.error("HLS.js Fatal Error:", data);
-              tryFallback("Stream unavailable. It might be blocked or offline.");
+        hls.on(Hls.Events.ERROR, (_event, data) => {
+          if (data.fatal) {
+            console.error("HLS fatal error:", data);
+            // If direct HLS failed, try proxying the URL
+            if (!source.url.includes('/proxy')) {
+              const proxiedUrl = `/api/proxy?url=${encodeURIComponent(source.url)}`;
+              console.log("Retrying HLS through proxy:", proxiedUrl);
+              hls.loadSource(proxiedUrl);
+            } else {
+              tryFallback("Stream unavailable or offline.");
             }
-          });
-          return;
-        }
+          }
+        });
+        return;
+      }
 
-        // Native fallback (Safari / iOS 10 iPad 4)
-        if (supportsNativeHls) {
-          video.src = source.url;
-          
-          const handleLoaded = () => {
-             setIsBuffering(false);
-             video.play().catch(e => console.log("Autoplay blocked"));
-          };
-          const handleError = () => {
-             console.error("Native Video Error", video.error);
-             tryFallback("Stream unavailable or incompatible with this device.");
-          };
-          
-          video.addEventListener('loadedmetadata', handleLoaded);
-          video.addEventListener('error', handleError);
-          
-          playerInstanceRef.current = {
-             destroy: () => {
-                video.removeEventListener('loadedmetadata', handleLoaded);
-                video.removeEventListener('error', handleError);
-             }
-          };
-          return;
-        }
+      // Native HLS (Safari)
+      if (supportsNativeHls) {
+        video.src = source.url;
+        video.addEventListener('loadedmetadata', () => {
+          setIsBuffering(false);
+          video.play().catch(() => {});
+        });
+        video.addEventListener('error', () => {
+          tryFallback("Playback error on this device.");
+        });
+        return;
       }
 
       tryFallback("Unsupported stream format.");
-
     };
 
-    // Delay slightly to ensure DOM is ready
     const timer = setTimeout(initPlayer, 100);
-
     return () => {
       clearTimeout(timer);
       cleanup();
@@ -215,13 +185,14 @@ export default function Player({ source, channelName, onClose, availableSources,
 
   return (
     <div className="relative w-full max-w-4xl mx-auto mb-6 bg-black rounded-xl overflow-hidden shadow-2xl border border-white/5 mt-2 group">
+      {/* Top Header */}
       <div className="absolute top-0 left-0 right-0 z-30 flex items-center justify-between p-3 bg-gradient-to-b from-black/90 to-transparent transition-opacity group-hover:opacity-100 opacity-60">
         <div className="flex items-center gap-2">
-           <div className="px-1.5 py-0.5 bg-red-600 text-white font-bold rounded text-[9px] uppercase tracking-tighter shadow-sm">LIVE</div>
-           <span className="text-white font-bold text-xs truncate max-w-[200px]">{channelName}</span>
-           <button onClick={() => setShowDebug(!showDebug)} className="ml-2 text-white/30 hover:text-white transition">
-             <Info size={14} />
-           </button>
+          <div className="px-1.5 py-0.5 bg-red-600 text-white font-bold rounded text-[9px] uppercase tracking-tighter shadow-sm">LIVE</div>
+          <span className="text-white font-bold text-xs truncate max-w-[200px]">{channelName}</span>
+          <button onClick={() => setShowDebug(!showDebug)} className="ml-2 text-white/30 hover:text-white transition">
+            <Info size={14} />
+          </button>
         </div>
         <button onClick={onClose} className="p-1.5 bg-white/10 hover:bg-red-600 rounded-full text-white transition active:scale-90">
           <X size={16} />
@@ -229,59 +200,72 @@ export default function Player({ source, channelName, onClose, availableSources,
       </div>
 
       <div className="w-full bg-black flex items-center justify-center aspect-video relative">
-        {isBuffering && !error && (
+        {/* Buffering Indicator */}
+        {isBuffering && !error && actualType !== 'youtube' && (
           <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-black/40">
             <Loader2 className="w-8 h-8 text-red-600 animate-spin" />
           </div>
         )}
 
+        {/* Error Screen */}
         {error && (
           <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-[#0a0a0a] px-6 text-center">
             {isDrmError ? <Shield className="w-10 h-10 text-yellow-500 mb-4" /> : <AlertCircle className="w-10 h-10 text-red-500 mb-4" />}
             <h3 className="text-sm font-bold text-white mb-2">{isDrmError ? 'DRM Protected' : 'Playback Failed'}</h3>
             <p className="text-zinc-500 text-[10px] sm:text-xs max-w-[300px] mb-6 leading-relaxed font-mono">{error}</p>
-            
+
             <div className="flex flex-col w-full max-w-[240px]">
-               {availableSources && availableSources.length > 1 && (
-                 <div className="flex flex-col mb-3">
-                   <p className="text-[9px] text-zinc-600 uppercase font-bold tracking-widest mb-2">Try another server:</p>
-                   <div className="grid grid-cols-2">
-                     {availableSources.filter(s => s.name !== source.name).slice(0, 4).map((s, idx) => (
-                       <button 
-                         key={idx}
-                         onClick={() => onSwitchSource(s)}
-                         className="px-2 py-2 m-1 bg-red-600/10 hover:bg-red-600 border border-red-500/20 rounded text-[9px] font-bold transition active:scale-95 text-red-500 hover:text-white"
-                       >
-                         {s.name}
-                       </button>
-                     ))}
-                   </div>
-                 </div>
-               )}
-               <button onClick={onClose} className="px-5 py-2 mt-2 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-xs font-bold transition active:scale-95 shadow-lg border border-white/5">
-                 BACK TO LIST
-               </button>
+              {availableSources && availableSources.length > 1 && (
+                <div className="flex flex-col mb-3">
+                  <p className="text-[9px] text-zinc-600 uppercase font-bold tracking-widest mb-2">Try another server:</p>
+                  <div className="grid grid-cols-2">
+                    {availableSources.filter(s => s.name !== source.name).map((s, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => onSwitchSource(s)}
+                        className="px-2 py-2 m-1 bg-red-600/10 hover:bg-red-600 border border-red-500/20 rounded text-[9px] font-bold transition active:scale-95 text-red-500 hover:text-white"
+                      >
+                        {s.name}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+              <button onClick={onClose} className="px-5 py-2 mt-2 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-xs font-bold transition active:scale-95 shadow-lg border border-white/5">
+                BACK TO LIST
+              </button>
             </div>
           </div>
         )}
 
+        {/* Debug Box */}
         {showDebug && (
           <div className="absolute bottom-16 left-4 right-4 z-40 bg-black/80 p-3 rounded text-[9px] font-mono text-green-500 break-all border border-green-500/20 max-h-[100px] overflow-auto pointer-events-none">
-            URL: {source.url}<br/>
-            TYPE: {detectStreamType(source.url, source.type)}<br/>
-            DRM: {source.key ? 'YES' : 'NO'}<br/>
-            UA: {navigator.userAgent}
+            URL: {source?.url}<br/>
+            TYPE: {actualType}<br/>
+            SOURCE: {source?.name}
           </div>
         )}
 
-        <video 
-          ref={videoRef} 
-          controls 
-          className="w-full h-full"
-          style={{ backgroundColor: 'black' }}
-          referrerPolicy="no-referrer"
-          crossOrigin="anonymous"
-        />
+        {/* YouTube Stream Embed */}
+        {actualType === 'youtube' ? (
+          <iframe
+            src={source.url}
+            className="w-full h-full border-0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
+            title={channelName}
+          />
+        ) : (
+          <video
+            ref={videoRef}
+            controls
+            className="w-full h-full"
+            style={{ backgroundColor: 'black' }}
+            referrerPolicy="no-referrer"
+            crossOrigin="anonymous"
+          />
+        )}
       </div>
     </div>
   );
