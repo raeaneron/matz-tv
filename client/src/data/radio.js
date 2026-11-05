@@ -1,26 +1,173 @@
 export const radioStations = [
-  // Metro Manila - FM
-  { id: 1, name: "DWRR MOR 101.9", frequency: "101.9 FM", region: "Metro Manila", genre: "OPM / Pop", url: "https://stream-relay-geo.ntslive.net/stream2", logo: "https://placehold.co/80x80/1a1a2e/e94560?text=MOR" },
-  { id: 2, name: "Love Radio 90.7", frequency: "90.7 FM", region: "Metro Manila", genre: "OPM / Love Songs", url: "https://ph-mnl-ice.radyo.com.ph/love907", logo: "https://placehold.co/80x80/1a1a2e/e94560?text=Love" },
-  { id: 3, name: "Easy Rock 96.3", frequency: "96.3 FM", region: "Metro Manila", genre: "Easy Listening", url: "https://ph-mnl-ice.radyo.com.ph/easy963", logo: "https://placehold.co/80x80/1a1a2e/e94560?text=Easy" },
-  { id: 4, name: "Yes FM 101.1", frequency: "101.1 FM", region: "Metro Manila", genre: "OPM Hits", url: "https://ph-mnl-ice.radyo.com.ph/yes1011", logo: "https://placehold.co/80x80/1a1a2e/e94560?text=YES" },
-  { id: 5, name: "DWRR RX 93.1", frequency: "93.1 FM", region: "Metro Manila", genre: "Rock / Alternative", url: "https://ph-mnl-ice.radyo.com.ph/rx931", logo: "https://placehold.co/80x80/1a1a2e/e94560?text=RX" },
-  { id: 6, name: "DZMM TeleRadyo 630", frequency: "630 AM", region: "Metro Manila", genre: "News / Talk", url: "https://teleradyo.com/stream/teleradyo.mp3", logo: "https://placehold.co/80x80/1a1a2e/e94560?text=DZMM" },
-  { id: 7, name: "DZRH 666", frequency: "666 AM", region: "Metro Manila", genre: "News / Talk", url: "https://dzrh.com.ph/stream.mp3", logo: "https://placehold.co/80x80/1a1a2e/e94560?text=DZRH" },
-  { id: 8, name: "DWAR Radyo Singko 92.3", frequency: "92.3 FM", region: "Metro Manila", genre: "News / Talk", url: "https://ph-mnl-ice.radyo.com.ph/singko923", logo: "https://placehold.co/80x80/1a1a2e/e94560?text=92.3" },
-  { id: 9, name: "Magic 89.9", frequency: "89.9 FM", region: "Metro Manila", genre: "Pop / Top 40", url: "https://ph-mnl-ice.radyo.com.ph/magic899", logo: "https://placehold.co/80x80/1a1a2e/e94560?text=Magic" },
-  { id: 10, name: "Monster RX 93.1", frequency: "93.1 FM", region: "Metro Manila", genre: "Rock", url: "https://ph-mnl-ice.radyo.com.ph/monster931", logo: "https://placehold.co/80x80/1a1a2e/e94560?text=Monster" },
+  // Metro Manila
+  {
+    id: 1,
+    name: "DZRH 666 Manila",
+    frequency: "666 AM",
+    region: "Metro Manila",
+    genre: "News / Public Affairs",
+    url: "https://azura.dzrh.com.ph/listen/dzrh_manila/radio.mp3",
+    logo: "https://placehold.co/80x80/b91c1c/ffffff?text=DZRH"
+  },
+  {
+    id: 2,
+    name: "105.9 Love Radio Manila",
+    frequency: "105.9 FM",
+    region: "Metro Manila",
+    genre: "OPM / Masa Hits",
+    url: "https://azura.loveradio.com.ph/listen/love_radio_manila/radio.mp3",
+    logo: "https://placehold.co/80x80/e11d48/ffffff?text=LOVE"
+  },
+  {
+    id: 3,
+    name: "96.3 Easy Rock Manila",
+    frequency: "96.3 FM",
+    region: "Metro Manila",
+    genre: "Lite Rock / Acoustic",
+    url: "https://azura.easyrock.com.ph/listen/easy_rock_manila/radio.mp3",
+    logo: "https://placehold.co/80x80/2563eb/ffffff?text=EASY"
+  },
+  {
+    id: 4,
+    name: "101.1 Yes FM Manila",
+    frequency: "101.1 FM",
+    region: "Metro Manila",
+    genre: "OPM / Pinoy Pop",
+    url: "https://azura.yesfm.com.ph/listen/yes_fm_manila/radio.mp3",
+    logo: "https://placehold.co/80x80/f59e0b/ffffff?text=YES"
+  },
+  {
+    id: 5,
+    name: "105.9 True FM (TV5)",
+    frequency: "105.9 FM",
+    region: "Metro Manila",
+    genre: "News / Talk / Sports",
+    url: "https://radio.tv5.com.ph/truefm/audio.stream/playlist.m3u8",
+    logo: "https://placehold.co/80x80/dc2626/ffffff?text=TRUE"
+  },
+  {
+    id: 6,
+    name: "Radyo Katribu Philippines",
+    frequency: "Online",
+    region: "Metro Manila",
+    genre: "Culture / Community",
+    url: "https://io.radyoph.com:8020/katribu",
+    logo: "https://placehold.co/80x80/16a34a/ffffff?text=KATRIBU"
+  },
+  {
+    id: 7,
+    name: "105.5 Sky Radio",
+    frequency: "105.5 FM",
+    region: "Metro Manila",
+    genre: "Pop / Hits",
+    url: "https://cast.skyradio105.com/proxy/skyradio105/stream",
+    logo: "https://placehold.co/80x80/0284c7/ffffff?text=SKY"
+  },
+
+  // Luzon
+  {
+    id: 8,
+    name: "100.7 Love Radio Lucena",
+    frequency: "100.7 FM",
+    region: "Luzon",
+    genre: "Masa / OPM",
+    url: "https://loveradiolucena.radioca.st/",
+    logo: "https://placehold.co/80x80/db2777/ffffff?text=LUCENA"
+  },
+  {
+    id: 9,
+    name: "103.1 MOR Baguio",
+    frequency: "103.1 FM",
+    region: "Luzon",
+    genre: "Top 40 / OPM",
+    url: "https://playerservices.streamtheworld.com/api/livestream-redirect/MORFM_S01AAC.aac",
+    logo: "https://placehold.co/80x80/7c3aed/ffffff?text=BAGUIO"
+  },
+  {
+    id: 10,
+    name: "101.7 Your Love FM",
+    frequency: "101.7 FM",
+    region: "Luzon",
+    genre: "Love Songs",
+    url: "https://radio.1017yourlovefm.com/listen/sanibpwersa/radio.mp3",
+    logo: "https://placehold.co/80x80/e11d48/ffffff?text=101.7"
+  },
+  {
+    id: 11,
+    name: "105.5 Wild FM Baguio",
+    frequency: "105.5 FM",
+    region: "Luzon",
+    genre: "Dance / Pop Hits",
+    url: "http://62.138.18.102:8133/stream",
+    logo: "https://placehold.co/80x80/ea580c/ffffff?text=WILD"
+  },
+  {
+    id: 12,
+    name: "101.5 BiG SOUND FM",
+    frequency: "101.5 FM",
+    region: "Luzon",
+    genre: "Contemporary Hit Radio",
+    url: "http://162.220.162.10:8184/stream",
+    logo: "https://placehold.co/80x80/4f46e5/ffffff?text=BIG"
+  },
+
   // Visayas
-  { id: 11, name: "Cebu RMN DYRF", frequency: "792 AM", region: "Visayas", genre: "News / Talk", url: "https://rmn.com.ph/stream/cebu.mp3", logo: "https://placehold.co/80x80/1a1a2e/e94560?text=DYRF" },
-  { id: 12, name: "Bacolod DYVR", frequency: "801 AM", region: "Visayas", genre: "News / Talk", url: "https://rmn.com.ph/stream/bacolod.mp3", logo: "https://placehold.co/80x80/1a1a2e/e94560?text=DYVR" },
-  { id: 13, name: "Iloilo DYRI", frequency: "738 AM", region: "Visayas", genre: "News / Talk", url: "https://rmn.com.ph/stream/iloilo.mp3", logo: "https://placehold.co/80x80/1a1a2e/e94560?text=DYRI" },
+  {
+    id: 13,
+    name: "103.5 Retro Cebu",
+    frequency: "103.5 FM",
+    region: "Visayas",
+    genre: "Classic Hits / Retro",
+    url: "http://148.72.153.65:9232/stream",
+    logo: "https://placehold.co/80x80/d97706/ffffff?text=CEBU"
+  },
+
   // Mindanao
-  { id: 14, name: "Davao DXDC", frequency: "711 AM", region: "Mindanao", genre: "News / Talk", url: "https://rmn.com.ph/stream/davao.mp3", logo: "https://placehold.co/80x80/1a1a2e/e94560?text=DXDC" },
-  { id: 15, name: "CDO DXCC", frequency: "891 AM", region: "Mindanao", genre: "News / Talk", url: "https://rmn.com.ph/stream/cdo.mp3", logo: "https://placehold.co/80x80/1a1a2e/e94560?text=DXCC" },
+  {
+    id: 14,
+    name: "100.7 XFM Tagum",
+    frequency: "100.7 FM",
+    region: "Mindanao",
+    genre: "News & Music",
+    url: "http://209.126.124.126:8681/stream",
+    logo: "https://placehold.co/80x80/059669/ffffff?text=TAGUM"
+  },
+  {
+    id: 15,
+    name: "81.7 Happy Pikz FM",
+    frequency: "81.7 FM",
+    region: "Mindanao",
+    genre: "Community Radio",
+    url: "http://s3.voscast.com:11272/stream/1/",
+    logo: "https://placehold.co/80x80/ca8a04/ffffff?text=HAPPY"
+  },
+
   // International
-  { id: 16, name: "BBC World Service", frequency: "Online", region: "International", genre: "News / Talk", url: "https://stream.live.vc.bbcmedia.co.uk/bbc_world_service", logo: "https://placehold.co/80x80/1a1a2e/e94560?text=BBC" },
-  { id: 17, name: "Radio Japan NHK World", frequency: "Online", region: "International", genre: "News / Talk", url: "https://nhkworld.nhk.or.jp/en/", logo: "https://placehold.co/80x80/1a1a2e/e94560?text=NHK" },
-  { id: 18, name: "VOA Radio", frequency: "Online", region: "International", genre: "News / Talk", url: "https://voa-ingest.akamaized.net/hls/live/2035144/VOAENG/master.m3u8", logo: "https://placehold.co/80x80/1a1a2e/e94560?text=VOA" },
-  { id: 19, name: "RFI English", frequency: "Online", region: "International", genre: "News / Talk", url: "https://live02.rfi.fr/rfianglais-128.mp3", logo: "https://placehold.co/80x80/1a1a2e/e94560?text=RFI" },
-  { id: 20, name: "Calm Radio Focus", frequency: "Online", region: "International", genre: "Relaxation", url: "https://channels.calmradio.com/api/4.0/stream/token/token/stream.mp3", logo: "https://placehold.co/80x80/1a1a2e/e94560?text=Calm" },
+  {
+    id: 16,
+    name: "BBC World Service",
+    frequency: "Global",
+    region: "International",
+    genre: "Global News / Analysis",
+    url: "https://stream.live.vc.bbcmedia.co.uk/bbc_world_service",
+    logo: "https://placehold.co/80x80/991b1b/ffffff?text=BBC"
+  },
+  {
+    id: 17,
+    name: "Radio France Internationale (RFI)",
+    frequency: "Global",
+    region: "International",
+    genre: "International News",
+    url: "https://live02.rfi.fr/rfianglais-128.mp3",
+    logo: "https://placehold.co/80x80/0284c7/ffffff?text=RFI"
+  },
+  {
+    id: 18,
+    name: "Voice of America (VOA)",
+    frequency: "Global",
+    region: "International",
+    genre: "News / Documentaries",
+    url: "https://voa-ingest.akamaized.net/hls/live/2035144/VOAENG/master.m3u8",
+    logo: "https://placehold.co/80x80/1e40af/ffffff?text=VOA"
+  }
 ];
