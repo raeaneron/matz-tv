@@ -19,12 +19,17 @@ export const iptvService = {
     }
 
     let finalUrl = source.url.trim();
+    const isYouTube = source.type === 'youtube' || finalUrl.includes('youtube.com') || finalUrl.includes('youtu.be');
+
+    if (isYouTube) {
+      return { url: finalUrl, type: 'youtube' };
+    }
+
     const streamType = source.type || (finalUrl.includes('.mpd') ? 'mpd' : 'hls');
 
-    // Proxy http:// streams to avoid mixed-content errors on HTTPS Netlify site
+    // Proxy insecure http:// streams to avoid browser mixed-content blocks
     if (finalUrl.startsWith('http://') || finalUrl.includes('.mpd')) {
-      const ext = finalUrl.includes('.mpd') ? '/stream.mpd' : (finalUrl.includes('.m3u8') ? '/stream.m3u8' : '');
-      finalUrl = `${PROXY_PATH}${ext}?url=${encodeURIComponent(finalUrl)}`;
+      finalUrl = `${PROXY_PATH}?url=${encodeURIComponent(finalUrl)}`;
     }
 
     return { url: finalUrl, type: streamType };
