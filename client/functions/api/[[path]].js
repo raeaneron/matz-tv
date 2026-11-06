@@ -27,20 +27,59 @@ export async function onRequest(context) {
 
     try {
       const cleanHandle = handle.startsWith('@') ? handle : `@${handle}`;
-      const res = await fetch(`https://www.youtube.com/${cleanHandle}/live`, {
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36'
-        },
-        redirect: 'follow'
-      });
-      const html = await res.text();
       let videoId = null;
-      const match1 = html.match(/canonical" href="https:\/\/www\.youtube\.com\/watch\?v=([a-zA-Z0-9_-]{11})"/);
-      if (match1) {
-        videoId = match1[1];
-      } else {
-        const match2 = html.match(/"videoId":"([a-zA-Z0-9_-]{11})"/);
-        if (match2) videoId = match2[1];
+
+      // 1. Check PinasDex for verified live stream IDs
+      try {
+        const pinasRes = await fetch('https://pinasdex.com/live-tv/', {
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+          }
+        });
+        if (pinasRes.ok) {
+          const pinasHtml = await pinasRes.text();
+          const matchRows = pinasHtml.match(/<script id="lt-rows" type="application\/json">(.*?)<\/script>/);
+          if (matchRows) {
+            const rows = JSON.parse(matchRows[1]);
+            const handleLower = cleanHandle.toLowerCase();
+            let matchedRow = null;
+            if (handleLower.includes('gmanetwork')) {
+              matchedRow = rows.find(r => r.slug === 'kapuso-stream' || r.name?.toLowerCase().includes('kapuso'));
+            } else if (handleLower.includes('gmanews')) {
+              matchedRow = rows.find(r => r.slug === 'gma-news' || r.name?.toLowerCase().includes('gma news'));
+            } else if (handleLower.includes('abscbnentertainment')) {
+              matchedRow = rows.find(r => r.slug === 'kapamilya-online-live' || r.name?.toLowerCase().includes('kapamilya'));
+            } else if (handleLower.includes('untv')) {
+              matchedRow = rows.find(r => r.slug === 'untv' || r.name?.toLowerCase().includes('untv'));
+            } else if (handleLower.includes('dzrh')) {
+              matchedRow = rows.find(r => r.slug === 'dzrh-tv' || r.name?.toLowerCase().includes('dzrh'));
+            } else if (handleLower.includes('tv5')) {
+              matchedRow = rows.find(r => r.slug === 'tv5-kapatid' || r.name?.toLowerCase().includes('tv5'));
+            } else if (handleLower.includes('net25')) {
+              matchedRow = rows.find(r => r.slug === 'net25' || r.name?.toLowerCase().includes('net25'));
+            }
+            if (matchedRow && matchedRow.id) {
+              videoId = matchedRow.id;
+            }
+          }
+        }
+      } catch (errPinas) {
+        console.warn('Pinasdex resolver fallback:', errPinas.message);
+      }
+
+      // 2. Fallback to direct YouTube channel scrape
+      if (!videoId) {
+        const res = await fetch(`https://www.youtube.com/${cleanHandle}/live`, {
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36'
+          },
+          redirect: 'follow'
+        });
+        const html = await res.text();
+        const match1 = html.match(/canonical" href="https:\/\/www\.youtube\.com\/watch\?v=([a-zA-Z0-9_-]{11})"/);
+        if (match1) {
+          videoId = match1[1];
+        }
       }
 
       return new Response(JSON.stringify({ handle: cleanHandle, videoId }), {
