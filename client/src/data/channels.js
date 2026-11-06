@@ -6,12 +6,12 @@ export const channels = [
     name: "Kapamilya Online Live",
     category: "PH LOCAL",
     title: "ABS-CBN Entertainment | 24/7 Live Stream",
-    youtubeId: "xS_VcSS9Cjw",
+    youtubeId: "GpM5UFX4LKo",
     handle: "@abscbnentertainment",
     hls: "",
     logo: "https://pinasdex.com/media/live/02-40052e4f.png",
     sources: [
-      { name: "Live Stream", url: "https://www.youtube-nocookie.com/embed/xS_VcSS9Cjw", type: "youtube", index: 0 }
+      { name: "Live Stream", url: "https://www.youtube-nocookie.com/embed/GpM5UFX4LKo", type: "youtube", index: 0 }
     ]
   },
   {
@@ -34,12 +34,12 @@ export const channels = [
     name: "Kapuso Stream (GMA 7)",
     category: "PH LOCAL",
     title: "GMA Network | Kapuso Stream Teleseryes & Shows",
-    youtubeId: "OkBXqDc4Ak8",
+    youtubeId: "Jh1l3ue0xDI",
     handle: "@gmanetwork",
     hls: "",
     logo: "https://pinasdex.com/media/live/07-39d9fec4.png",
     sources: [
-      { name: "Live Stream", url: "https://www.youtube-nocookie.com/embed/OkBXqDc4Ak8", type: "youtube", index: 0 }
+      { name: "Live Stream", url: "https://www.youtube-nocookie.com/embed/Jh1l3ue0xDI", type: "youtube", index: 0 }
     ]
   },
   {
@@ -48,12 +48,12 @@ export const channels = [
     name: "UNTV News & Rescue",
     category: "PH LOCAL",
     title: "UNTV Public Service & News Live Broadcast",
-    youtubeId: "F7LPbO2nQRk",
+    youtubeId: "TKnQY5DUNHU",
     handle: "@UNTVNewsandRescue",
     hls: "",
     logo: "https://pinasdex.com/media/live/37-f88bbe0c.png",
     sources: [
-      { name: "Live Stream", url: "https://www.youtube-nocookie.com/embed/F7LPbO2nQRk", type: "youtube", index: 0 }
+      { name: "Live Stream", url: "https://www.youtube-nocookie.com/embed/TKnQY5DUNHU", type: "youtube", index: 0 }
     ]
   },
   {
