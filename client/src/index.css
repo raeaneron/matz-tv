@@ -614,3 +614,230 @@ button {
   .needle { transition: none; }
   .eq i   { transition: none; }
 }
+
+/* ─── RESPONSIVE: TABLETS & MOBILE ───────────────────────────────────────── */
+
+/* Tablets (portrait & landscape up to 980px) */
+@media (max-width: 980px) {
+  main {
+    padding: 20px 14px 48px;
+  }
+  .tv-page,
+  .radio-page {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  .guide ul {
+    max-height: 420px;
+  }
+}
+
+/* Mobile & Small Tablets (up to 640px) */
+@media (max-width: 640px) {
+  main {
+    padding: 14px 10px 40px;
+  }
+  h1 {
+    font-size: 24px;
+  }
+  .sub {
+    font-size: 13px;
+    margin: 2px 0 16px;
+  }
+
+  /* Tab Navigation */
+  .tab-nav {
+    gap: 8px;
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    justify-content: center;
+  }
+  .tab-btn {
+    font-size: 14px;
+    padding: 8px 18px;
+  }
+
+  /* TV Cabinet Mobile */
+  .retro-tv {
+    padding-top: 38px;
+  }
+  .ant::before,
+  .ant::after {
+    height: 42px;
+  }
+  .cab {
+    grid-template-columns: 1fr;
+    padding: 12px;
+    border-radius: 18px;
+    gap: 12px;
+  }
+  .bezel {
+    padding: 8px;
+    border-radius: 14px / 12px;
+  }
+  .screen {
+    border-radius: 10px / 8px;
+  }
+  .osd {
+    font-size: 14px;
+    top: 6px;
+    left: 8px;
+  }
+  .msg {
+    font-size: 16px;
+    padding: 8px;
+  }
+
+  /* Side Knobs as horizontal toolbar */
+  .side {
+    flex-direction: row !important;
+    flex-wrap: nowrap;
+    justify-content: space-around;
+    align-items: center;
+    width: 100%;
+    padding: 4px 0;
+    gap: 6px;
+  }
+  .knob {
+    width: 46px;
+    height: 46px;
+    font-size: 10px;
+  }
+  .led {
+    width: 8px;
+    height: 8px;
+  }
+
+  /* TV Filter Chips */
+  .chips {
+    gap: 6px;
+    margin-top: 10px;
+  }
+  .chip {
+    padding: 4px 10px;
+    font-size: 12px;
+  }
+  .chips label {
+    width: 100%;
+    margin-left: 0;
+    margin-top: 6px;
+    justify-content: space-between;
+  }
+
+  /* Channel Guide Mobile */
+  .guide {
+    padding: 10px;
+    border-radius: 16px;
+  }
+  .guide h2 {
+    font-size: 15px;
+    margin-bottom: 6px;
+  }
+  .guide ul {
+    max-height: 360px;
+    gap: 4px;
+  }
+  .guide button {
+    grid-template-columns: 28px 34px 1fr auto;
+    gap: 8px;
+    padding: 6px 8px;
+    border-radius: 8px;
+  }
+  .guide-logo-box {
+    width: 34px;
+    height: 26px;
+  }
+  .guide .num {
+    font-size: 13px;
+  }
+  .guide .nm {
+    font-size: 13px;
+  }
+  .guide .in {
+    font-size: 11px;
+  }
+  .guide .live {
+    font-size: 10px;
+  }
+
+  /* Radio Mobile */
+  .radio {
+    padding: 12px;
+    border-radius: 18px;
+    gap: 10px;
+  }
+  .grille {
+    height: 38px;
+    border-radius: 8px;
+  }
+  .lcd {
+    padding: 8px 10px;
+    border-radius: 10px;
+  }
+  .lcd .top {
+    font-size: 11px;
+  }
+  .lcd .freq {
+    font-size: 26px;
+  }
+  .lcd .name {
+    font-size: 16px;
+  }
+  .lcd .desc {
+    font-size: 11px;
+    min-height: 1.3em;
+  }
+  .lcd-logo-box {
+    width: 44px;
+    height: 44px;
+  }
+  .eq {
+    height: 44px;
+    margin-top: 4px;
+  }
+  .dial {
+    height: 26px;
+  }
+  .presets {
+    gap: 5px;
+  }
+  .presets .chip {
+    font-size: 10px;
+    padding: 3px 7px;
+  }
+  .ctrl {
+    gap: 8px;
+    justify-content: space-around;
+  }
+  .rknob {
+    width: 42px;
+    height: 42px;
+    font-size: 10px;
+  }
+  .play {
+    width: 50px;
+    height: 50px;
+    font-size: 18px;
+  }
+  .rvol-wrap {
+    width: 100%;
+    margin-top: 4px;
+    justify-content: center;
+  }
+}
+
+/* Extra Small Phones (<= 380px) */
+@media (max-width: 380px) {
+  .knob {
+    width: 38px;
+    height: 38px;
+    font-size: 8px;
+  }
+  .side {
+    gap: 4px;
+  }
+  .tab-btn {
+    font-size: 12px;
+    padding: 6px 12px;
+  }
+}
